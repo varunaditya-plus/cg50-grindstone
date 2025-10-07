@@ -12,11 +12,75 @@ shape_type_t chain_color_shape = SHAPE_COUNT;
 int chain_len = 0;
 static int chain_rows[GRID_SIZE * GRID_SIZE];
 static int chain_cols[GRID_SIZE * GRID_SIZE];
+static bool chain_can_recolor = false; // becomes true after passing through a grindstone
 
 static void get_cell_center(int row, int col, int *cx, int *cy)
 {
 	*cx = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
 	*cy = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
+}
+
+static color_t lighten_color(color_t c)
+{
+    unsigned int r = (c >> 11) & 0x1f;
+    unsigned int g = (c >> 5) & 0x3f;
+    unsigned int b = c & 0x1f;
+    r = (r + 31) >> 1;
+    g = (g + 63) >> 1;
+    b = (b + 31) >> 1;
+    return (color_t)((r << 11) | (g << 5) | b);
+}
+
+static void draw_line_thick(int x0, int y0, int x1, int y1, color_t color, int thickness)
+{
+    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy, e2;
+    int half = (thickness <= 1) ? 0 : (thickness / 2);
+    int x = x0, y = y0;
+    while(1) {
+        for(int oy = -half; oy <= half; oy++) {
+            for(int ox = -half; ox <= half; ox++) {
+                dpixel(x + ox, y + oy, color);
+            }
+        }
+        if(x == x1 && y == y1) break;
+        e2 = 2 * err;
+        if(e2 >= dy) { err += dy; x += sx; }
+        if(e2 <= dx) { err += dx; y += sy; }
+    }
+}
+
+static void draw_arrow(int cx, int cy, int dirx, int diry, int size, color_t color)
+{
+    int hx = cx + dirx * size;
+    int hy = cy + diry * size;
+    int tx = cx - dirx * (size - 2);
+    int ty = cy - diry * (size - 2);
+    draw_line_thick(tx, ty, hx, hy, color, 3);
+    int px = -diry;
+    int py = dirx;
+    int wing = size / 2 + 1;
+    int bx = hx - dirx * wing;
+    int by = hy - diry * wing;
+    draw_line_thick(hx, hy, bx + px * wing, by + py * wing, color, 3);
+    draw_line_thick(hx, hy, bx - px * wing, by - py * wing, color, 3);
+}
+
+static void draw_chevron(int cx, int cy, int dirx, int diry, int size, color_t color)
+{
+    // Continuous chevron resembling '>' shape pointing in (dirx, diry)
+    int tip_x = cx + dirx * size;
+    int tip_y = cy + diry * size;
+    int px = -diry; // perpendicular unit (axis-aligned/diagonal values -1,0,1)
+    int py = dirx;
+    int base_offset = size / 3; // slightly closer base for a wider look
+    int base_x = cx - dirx * base_offset;
+    int base_y = cy - diry * base_offset;
+    int wing = size; // wider chevrons
+    // Two strokes from base corners to tip (thinner)
+    draw_line_thick(base_x + px * wing, base_y + py * wing, tip_x, tip_y, color, 1);
+    draw_line_thick(base_x - px * wing, base_y - py * wing, tip_x, tip_y, color, 1);
 }
 
 void draw_chain(void)
@@ -25,15 +89,53 @@ void draw_chain(void)
 	int prev_x, prev_y;
 	int player_row, player_col;
 	get_player_pos(&player_row, &player_col);
-	get_cell_center(player_row, player_col, &prev_x, &prev_y);
-	color_t color = shape_to_color(chain_color_shape);
-	for(int i = 0; i < chain_len; i++) {
+    get_cell_center(player_row, player_col, &prev_x, &prev_y);
+    // Skip already-visited steps so arrows always point forward from current player pos
+    int start_index = 0;
+    for(int i = 0; i < chain_len; i++) {
+        if(chain_rows[i] == player_row && chain_cols[i] == player_col) {
+            start_index = i + 1;
+            break;
+        }
+    }
+    // color can change after grindstone the moment we move into a non-grindstone cell when recolor is pending.
+    shape_type_t current_shape = SHAPE_COUNT;
+    bool recolor_pending = false;
+    for(int i = start_index; i < chain_len; i++) {
 		int row = chain_rows[i];
 		int col = chain_cols[i];
 		int cx, cy;
 		get_cell_center(row, col, &cx, &cy);
-		// Draw straight segment between consecutive chain points (supports diagonals)
-		draw_line(prev_x, prev_y, cx, cy, color);
+        bool is_grind = grindstone_is_at(row, col);
+        shape_type_t cell_shape = grid[row][col];
+        if(is_grind) {
+            // Hitting a grindstone schedules a recolor on the next colored cell
+            recolor_pending = true;
+        } else if(cell_shape != SHAPE_COUNT) {
+            if(current_shape == SHAPE_COUNT) {
+                current_shape = cell_shape;
+            } else if(recolor_pending) {
+                current_shape = cell_shape;
+                recolor_pending = false;
+            }
+        }
+        // Fallback color if no color has been established yet
+        color_t seg_color = (current_shape == SHAPE_COUNT)
+            ? lighten_color(COLOR_BLUE)
+            : lighten_color(shape_to_color(current_shape));
+        int dx = cx - prev_x;
+        int dy = cy - prev_y;
+        int dirx = (dx > 0) - (dx < 0);
+        int diry = (dy > 0) - (dy < 0);
+        int seg_len = (abs(dx) > abs(dy)) ? abs(dx) : abs(dy);
+
+		int spacing = 5;
+        int arrow_size = 5;
+        for(int t = spacing/2; t <= seg_len; t += spacing) {
+            int ax = prev_x + (dx * t) / (seg_len == 0 ? 1 : seg_len);
+            int ay = prev_y + (dy * t) / (seg_len == 0 ? 1 : seg_len);
+            draw_chevron(ax, ay, dirx, diry, arrow_size, seg_color);
+        }
 		prev_x = cx; prev_y = cy;
 	}
 }
@@ -66,11 +168,26 @@ bool add_chain_point(int row, int col)
 		if(chain_rows[i] == row && chain_cols[i] == col) return false;
 	}
 
-	shape_type_t s = grid[row][col];
-	if(chain_color_shape == SHAPE_COUNT) {
-		chain_color_shape = s;
-	}
-	if(s != chain_color_shape) return false;
+    bool is_grind = grindstone_is_at(row, col);
+    shape_type_t s = grid[row][col];
+    if(is_grind) {
+        // Passing through a grindstone is always allowed and enables recolor
+        chain_can_recolor = true;
+    }
+    else {
+        // Cannot step on empty unless it's a grindstone
+        if(s == SHAPE_COUNT) return false;
+        if(chain_color_shape == SHAPE_COUNT) {
+            // First colored piece selects the chain color
+            chain_color_shape = s;
+        }
+        else if(chain_can_recolor) {
+            // After a grindstone, allow changing the chain color once
+            chain_color_shape = s;
+            chain_can_recolor = false;
+        }
+        if(s != chain_color_shape) return false;
+    }
 
 	chain_rows[chain_len] = row;
 	chain_cols[chain_len] = col;
@@ -146,12 +263,18 @@ void execute_chain(void)
 		int target_row = chain_rows[i];
 		int target_col = chain_cols[i];
 		set_player_pos(target_row, target_col);
-		// Remove monster at target
-		grid[target_row][target_col] = SHAPE_COUNT;
+        // Remove monster or grindstone at target
+        if(grindstone_is_at(target_row, target_col)) {
+            grindstone_remove(target_row, target_col);
+        } else {
+            grid[target_row][target_col] = SHAPE_COUNT;
+        }
 		// Redraw frame
 		draw_background();
 		draw_grid_lines();
-		draw_monsters();
+        // Chain behind entities
+        draw_chain();
+        draw_monsters();
 		draw_player();
 		dupdate();
 		// brief delay so steps are visible
@@ -163,6 +286,7 @@ void execute_chain(void)
     // Clear chain state
     chain_len = 0;
     chain_color_shape = SHAPE_COUNT;
+    chain_can_recolor = false;
 
     // If the executed chain length was 10 or more, spawn a grindstone at random
     if(executed_len >= 10) {

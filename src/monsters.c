@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "player.h"
 #include "grindstone.h"
+#include "chain.h"
 
 shape_type_t grid[GRID_SIZE][GRID_SIZE];
 bool grid_initialized = false;
@@ -191,6 +192,7 @@ void animate_gravity_and_refill(void)
         if(moved) {
             draw_background();
             draw_grid_lines();
+            draw_chain();
             draw_monsters();
             draw_player();
             dupdate();
