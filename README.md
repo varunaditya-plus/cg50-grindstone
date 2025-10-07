@@ -8,7 +8,7 @@ Created using gint and fxsdk in the language C, this is my attempt to recreate G
 for the fx-CG50 calculator. Grindstone is a game where you smash through monsters of the same color (simply).
 
 [Installation](#installation) •
-[About](#about) •
+[About](#about)
 
 <img src="https://go-skill-icons.vercel.app/api/icons?i=c,cmake&theme=dark" />
 
@@ -26,7 +26,7 @@ $ fxsdk build-cg
 ```
 
 <h2>✰ About</h2>
-After writing Block Blast, I found myself playing [Grindstone](https://store.steampowered.com/app/1818690/Grindstone) through Apple Arcade, and wanted to recreate it. Simply speaking, the game has this core functionality: the player is Jorj, and you need to smash through creeps (monsters) of the same color to create chains. 10+ in a chain creates a grindstone, which lets you switch creep color mid chain. You also need to beat bosses and different kinds of monsters while traversing through the levels. This game is meant to be a simpler version of that.
+After writing Block Blast, I found myself playing Grindstone (https://www.capybaragames.com/games/grindstone) through Apple Arcade, and wanted to recreate it. Simply speaking, the game has this core functionality: the player is Jorj, and you need to smash through creeps (monsters) of the same color to create chains. 10+ in a chain creates a grindstone, which lets you switch creep color mid chain. You also need to beat bosses and different kinds of monsters while traversing through the levels. This game is meant to be a simpler version of that.
 
 <br /><br />
 ∗ Made by Varun<br >
