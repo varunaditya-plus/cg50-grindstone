@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 #include <gint/display.h>
 #include "grindstone.h"
 #include "monsters.h"
@@ -34,20 +35,52 @@ void grindstone_remove(int row, int col)
 	grindstone_grid[row][col] = false;
 }
 
-static void draw_grindstone_icon(int cx, int cy, int size)
+// Draw a rainbow colored diamond with pixelated 3D bevels
+static void draw_rainbow_diamond(int cx, int cy, int size)
 {
-	for(int dy = -size; dy <= size; dy++) {
-		int halfw = size - (dy < 0 ? -dy : dy);
-		for(int dx = -halfw; dx <= halfw; dx++) {
-			color_t col;
-			if(dy < -size/4) col = COLOR_YELLOW;
-			else if(dx < -dy) col = COLOR_GREEN;
-			else if(dx > dy) col = COLOR_BLUE;
-			else col = COLOR_RED;
-			dpixel(cx + dx, cy + dy, col);
+	// Define rainbow colors in order
+	color_t rainbow_colors[] = {COLOR_RED, COLOR_YELLOW, COLOR_GREEN, COLOR_BLUE};
+	int num_colors = 4;
+	
+	// Diamond shape: |x| + |y| <= size
+	for(int y = -size; y <= size; y++) {
+		for(int x = -size; x <= size; x++) {
+			// Check if point is within diamond
+			if(abs(x) + abs(y) <= size) {
+				color_t pixel_color;
+				
+				// Determine if this pixel is on a bevel edge
+				bool is_top_edge = (abs(x) + abs(y) == size) && (y < 0); // Top half of diamond edge
+				bool is_bottom_edge = (abs(x) + abs(y) == size) && (y > 0); // Bottom half of diamond edge
+				bool is_left_edge = (abs(x) + abs(y) == size) && (x < 0); // Left half of diamond edge
+				bool is_right_edge = (abs(x) + abs(y) == size) && (x > 0); // Right half of diamond edge
+				
+				// Apply bevel colors
+				if(is_top_edge || is_left_edge) {
+					// White highlight on top and left edges
+					pixel_color = C_WHITE;
+				} else if(is_bottom_edge || is_right_edge) {
+					// Black shadow on bottom and right edges
+					pixel_color = C_BLACK;
+				} else {
+					// Interior: rainbow color based on angle
+					double angle = atan2(y, x);
+					// Convert from [-π, π] to [0, 2π]
+					if(angle < 0) angle += 2 * 3.14159265359;
+					// Map to color index (0 to num_colors-1)
+					int color_index = (int)((angle / (2 * 3.14159265359)) * num_colors) % num_colors;
+					pixel_color = rainbow_colors[color_index];
+				}
+				
+				dpixel(cx + x, cy + y, pixel_color);
+			}
 		}
 	}
-	for(int dx = -size/2; dx <= size/2; dx++) dpixel(cx + dx, cy - size/3, C_WHITE);
+}
+
+static void draw_grindstone_icon(int cx, int cy, int size)
+{
+	draw_rainbow_diamond(cx, cy, size);
 }
 
 void grindstone_draw_all(void)

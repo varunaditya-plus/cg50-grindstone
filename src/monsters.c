@@ -41,6 +41,8 @@ void draw_monsters(void)
 		for(int col = 0; col < GRID_SIZE; col++) {
             if(row == player_row && col == player_col) continue;
             if(grid[row][col] == SHAPE_COUNT) continue;
+            // Don't draw monsters on grindstone squares
+            if(grindstone_is_at(row, col)) continue;
 			int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
 			int y = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
 			draw_shape(x, y, grid[row][col]);
@@ -138,24 +140,26 @@ void apply_gravity_and_refill(void)
 		if(write_row == player_row && col == player_col) write_row--;
 		for(int row = GRID_SIZE - 1; row >= 0; row--) {
 			if(row == player_row && col == player_col) continue;
-            if(grid[row][col] != SHAPE_COUNT || grindstone_is_at(row, col)) {
+			// Skip grindstone squares - they stay empty
+			if(grindstone_is_at(row, col)) continue;
+			// Only process non-empty squares
+			if(grid[row][col] != SHAPE_COUNT) {
+				// Find the next available position below
+				while(write_row > row && (write_row == player_row || grindstone_is_at(write_row, col))) {
+					write_row--;
+				}
 				if(write_row != row) {
-                    // If destination has a grindstone, move write_row above it
-                    if(grindstone_is_at(write_row, col)) {
-                        write_row--;
-                        if(write_row == player_row && col == player_col) write_row--;
-                    }
-                    if(grid[row][col] != SHAPE_COUNT) {
-                        grid[write_row][col] = grid[row][col];
-                        grid[row][col] = SHAPE_COUNT;
-                    }
+					grid[write_row][col] = grid[row][col];
+					grid[row][col] = SHAPE_COUNT;
 				}
 				write_row--;
 				if(write_row == player_row && col == player_col) write_row--;
 			}
 		}
+		// Refill empty spaces from top, but skip grindstone squares
 		for(int row = write_row; row >= 0; row--) {
 			if(row == player_row && col == player_col) continue;
+			if(grindstone_is_at(row, col)) continue;
 			grid[row][col] = (shape_type_t)(rand() % SHAPE_COUNT);
 		}
 	}
@@ -177,9 +181,17 @@ void animate_gravity_and_refill(void)
             for(int row = GRID_SIZE - 2; row >= 0; row--) {
                 if(row == player_row && col == player_col) continue;
                 if(grid[row][col] == SHAPE_COUNT) continue;
+                // Don't move monsters from grindstone squares
+                if(grindstone_is_at(row, col)) continue;
+                
                 int below = row + 1;
                 // Skip the player cell when checking the below position
                 if(below == player_row && col == player_col) below++;
+                // Skip grindstone squares when checking below
+                while(below < GRID_SIZE && grindstone_is_at(below, col)) {
+                    below++;
+                    if(below == player_row && col == player_col) below++;
+                }
                 if(below < GRID_SIZE && grid[below][col] == SHAPE_COUNT) {
                     grid[below][col] = grid[row][col];
                     grid[row][col] = SHAPE_COUNT;
@@ -212,9 +224,9 @@ void animate_gravity_and_refill(void)
         }
         // For each empty, spawn above the grid and slide down per step
         while(empties-- > 0) {
-            // Find the first empty from top to place a new tile
+            // Find the first empty from top to place a new tile (skip grindstone squares)
             int spawn_row = 0;
-            while(spawn_row < GRID_SIZE && !(grid[spawn_row][col] == SHAPE_COUNT && !(spawn_row == player_row && col == player_col))) {
+            while(spawn_row < GRID_SIZE && !(grid[spawn_row][col] == SHAPE_COUNT && !(spawn_row == player_row && col == player_col) && !grindstone_is_at(spawn_row, col))) {
                 spawn_row++;
             }
             if(spawn_row >= GRID_SIZE) break;
@@ -225,6 +237,11 @@ void animate_gravity_and_refill(void)
             while(true) {
                 int below = r + 1;
                 if(below == player_row && col == player_col) below++;
+                // Skip grindstone squares when falling
+                while(below < GRID_SIZE && grindstone_is_at(below, col)) {
+                    below++;
+                    if(below == player_row && col == player_col) below++;
+                }
                 if(below < GRID_SIZE && grid[below][col] == SHAPE_COUNT) {
                     grid[below][col] = grid[r][col];
                     grid[r][col] = SHAPE_COUNT;

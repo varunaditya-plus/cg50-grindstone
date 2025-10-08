@@ -12,6 +12,7 @@ bool add_chain_point(int row, int col);
 bool add_chain_step(int drow, int dcol);
 void draw_chain(void);
 void execute_chain(void);
+void reset_chain_state(void);
 
 // Line utilities (used only here)
 void draw_line(int x0, int y0, int x1, int y1, color_t color);

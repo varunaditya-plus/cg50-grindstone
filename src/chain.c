@@ -13,6 +13,7 @@ int chain_len = 0;
 static int chain_rows[GRID_SIZE * GRID_SIZE];
 static int chain_cols[GRID_SIZE * GRID_SIZE];
 static bool chain_can_recolor = false; // becomes true after passing through a grindstone
+static bool grindstone_entered = false; // tracks if we're currently inside a grindstone
 
 static void get_cell_center(int row, int col, int *cx, int *cy)
 {
@@ -171,10 +172,16 @@ bool add_chain_point(int row, int col)
     bool is_grind = grindstone_is_at(row, col);
     shape_type_t s = grid[row][col];
     if(is_grind) {
-        // Passing through a grindstone is always allowed and enables recolor
-        chain_can_recolor = true;
+        // Entering a grindstone - mark that we're inside one
+        grindstone_entered = true;
     }
     else {
+        // Exiting a grindstone - if we were inside one, enable recolor
+        if(grindstone_entered) {
+            chain_can_recolor = true;
+            grindstone_entered = false;
+        }
+        
         // Cannot step on empty unless it's a grindstone
         if(s == SHAPE_COUNT) return false;
         if(chain_color_shape == SHAPE_COUNT) {
@@ -211,6 +218,13 @@ bool add_chain_step(int drow, int dcol)
 			chain_len--;
 			if(chain_len == 0) {
 				chain_color_shape = SHAPE_COUNT;
+				chain_can_recolor = false;
+				grindstone_entered = false;
+			} else {
+				// Check if we're going back to before a grindstone
+				// Reset grindstone state if we're backing up
+				grindstone_entered = false;
+				chain_can_recolor = false;
 			}
 			return true;
 		}
@@ -252,6 +266,14 @@ void draw_ortho_path(int x0, int y0, int x1, int y1, color_t color)
 }
 
 
+void reset_chain_state(void)
+{
+    chain_len = 0;
+    chain_color_shape = SHAPE_COUNT;
+    chain_can_recolor = false;
+    grindstone_entered = false;
+}
+
 void execute_chain(void)
 {
 	if(!chain_planning || chain_len == 0) return;
@@ -284,9 +306,7 @@ void execute_chain(void)
 	}
 
     // Clear chain state
-    chain_len = 0;
-    chain_color_shape = SHAPE_COUNT;
-    chain_can_recolor = false;
+    reset_chain_state();
 
     // If the executed chain length was 10 or more, spawn a grindstone at random
     if(executed_len >= 10) {
