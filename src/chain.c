@@ -52,22 +52,6 @@ static void draw_line_thick(int x0, int y0, int x1, int y1, color_t color, int t
     }
 }
 
-static void draw_arrow(int cx, int cy, int dirx, int diry, int size, color_t color)
-{
-    int hx = cx + dirx * size;
-    int hy = cy + diry * size;
-    int tx = cx - dirx * (size - 2);
-    int ty = cy - diry * (size - 2);
-    draw_line_thick(tx, ty, hx, hy, color, 3);
-    int px = -diry;
-    int py = dirx;
-    int wing = size / 2 + 1;
-    int bx = hx - dirx * wing;
-    int by = hy - diry * wing;
-    draw_line_thick(hx, hy, bx + px * wing, by + py * wing, color, 3);
-    draw_line_thick(hx, hy, bx - px * wing, by - py * wing, color, 3);
-}
-
 static void draw_chevron(int cx, int cy, int dirx, int diry, int size, color_t color)
 {
     // Continuous chevron resembling '>' shape pointing in (dirx, diry)
@@ -279,8 +263,6 @@ void execute_chain(void)
 	if(!chain_planning || chain_len == 0) return;
     // Step through each chain point, move player, delete monster at that cell
     int executed_len = chain_len;
-	int current_row = PLAYER_ROW;
-	int current_col = PLAYER_COL;
 	for(int i = 0; i < chain_len; i++) {
 		int target_row = chain_rows[i];
 		int target_col = chain_cols[i];
@@ -301,8 +283,6 @@ void execute_chain(void)
 		dupdate();
 		// brief delay so steps are visible
 		for(volatile int d=0; d<200000; d++); // simple busy-wait
-		current_row = target_row;
-		current_col = target_col;
 	}
 
     // Clear chain state
@@ -319,6 +299,8 @@ void execute_chain(void)
 	// Redraw everything
 	draw_background();
 	draw_grid_lines();
+	// After resolving the board, mark new outlined monsters for next round
+	add_random_outlines_after_chain();
 	draw_monsters();
 	draw_player();
 	dupdate();

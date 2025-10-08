@@ -46,7 +46,7 @@ static void draw_big_digit(int x, int y, int digit, int scale, color_t color)
 	}
 }
 
-static int draw_big_number(int x, int y, int value, int scale, color_t color)
+static int draw_big_number(int x, int y, int value, int scale)
 {
 	// returns width drawn; supports 0..99
 	if(value < 0) value = 0;
@@ -139,7 +139,7 @@ static void draw_chain_hud(void)
 	}
 
 	// Draw big number on top
-	draw_big_number(x, y, count, scale, C_WHITE);
+	draw_big_number(x, y, count, scale);
 }
 
 int main(void)
@@ -150,6 +150,7 @@ int main(void)
     draw_background();
     grindstone_clear_all();
     randomize_grid();
+    clear_all_outlines();
     draw_grid_lines();
     draw_chain();
     draw_monsters();
@@ -168,6 +169,7 @@ int main(void)
             chain_len = 0;
             grindstone_clear_all();
             randomize_grid();
+            clear_all_outlines();
             needs_redraw = true;
         }
         else if(key.key == KEY_ACON) {
