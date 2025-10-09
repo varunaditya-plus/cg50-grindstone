@@ -183,6 +183,20 @@ int main(void)
             // execute_chain handles redrawing
             continue;
         }
+        else if(key.key == KEY_5) {
+            if(undo_last_chain_step()) {
+                // Redraw after undo
+                draw_background();
+                draw_grid_lines();
+                draw_chain();
+                draw_monsters();
+                draw_player();
+                draw_chain_hud();
+            }
+            // move to next loop
+            dupdate();
+            continue;
+        }
         else if(key.key == KEY_EXIT) {
             // Reset current chain on Exit
             chain_color_shape = SHAPE_COUNT;
@@ -190,29 +204,20 @@ int main(void)
             needs_redraw = true;
         }
         else {
-            // Read simultaneous arrow key states to allow diagonals
+            // Map numpad keys to movement: 8 up, 2 down, 4 left, 6 right
+            // 7 up-left, 9 up-right, 1 down-left, 3 down-right
             int drow = 0;
             int dcol = 0;
-            if(keydown(KEY_UP)) drow -= 1;
-            if(keydown(KEY_DOWN)) drow += 1;
-            if(keydown(KEY_LEFT)) dcol -= 1;
-            if(keydown(KEY_RIGHT)) dcol += 1;
 
-            // If only one axis is pressed, give a brief grace period to catch the second key
-            if((drow != 0) ^ (dcol != 0)) {
-                // Longer grace window if starting a new chain, since timing is trickier
-                int iterations = (chain_len == 0) ? 60000 : 8000;
-                for(volatile int i = 0; i < iterations; i++) {
-                    if(dcol == 0) {
-                        if(keydown(KEY_LEFT)) { dcol = -1; break; }
-                        if(keydown(KEY_RIGHT)) { dcol = 1; break; }
-                    }
-                    if(drow == 0) {
-                        if(keydown(KEY_UP)) { drow = -1; break; }
-                        if(keydown(KEY_DOWN)) { drow = 1; break; }
-                    }
-                }
-            }
+            // Prioritize diagonals if a diagonal key is pressed
+            if(keydown(KEY_7)) { drow = -1; dcol = -1; }
+            else if(keydown(KEY_9)) { drow = -1; dcol = 1; }
+            else if(keydown(KEY_1)) { drow = 1; dcol = -1; }
+            else if(keydown(KEY_3)) { drow = 1; dcol = 1; }
+            else if(keydown(KEY_8)) { drow = -1; }
+            else if(keydown(KEY_2)) { drow = 1; }
+            else if(keydown(KEY_4)) { dcol = -1; }
+            else if(keydown(KEY_6)) { dcol = 1; }
 
             if(drow != 0 || dcol != 0) {
                 if(add_chain_step(drow, dcol)) needs_redraw = true;
