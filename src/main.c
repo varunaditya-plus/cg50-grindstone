@@ -141,10 +141,11 @@ static void draw_game_over_screen(void)
 	font_draw_text(text_x, text_y, game_over_text);
 }
 
-bool check_damage_from_outlined_monsters(void)
+int check_damage_from_outlined_monsters(void)
 {
 	int player_row, player_col;
 	get_player_pos(&player_row, &player_col);
+	int damage_count = 0;
 	
 	// Check only the 4 cardinal directions (up, down, left, right)
 	int directions[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // up, down, left, right
@@ -164,10 +165,10 @@ bool check_damage_from_outlined_monsters(void)
 		if(outlined[check_row][check_col] && grid[check_row][check_col] != SHAPE_COUNT) {
 			// Remove outline from this monster
 			outlined[check_row][check_col] = false;
-			return true; // Player takes damage
+			damage_count++; // Count this monster as dealing damage
 		}
 	}
-	return false; // No damage
+	return damage_count; // Return number of monsters that dealt damage
 }
 
 void draw_chain_hud(void)

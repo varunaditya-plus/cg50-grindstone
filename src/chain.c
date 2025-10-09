@@ -312,10 +312,11 @@ void execute_chain(void)
     for(volatile int d=0; d<1000000; d++); // 1 second delay
     
     // Check for damage from outlined monsters and apply it
-    
-    if(check_damage_from_outlined_monsters()) {
-        player_lives--;
+    int damage_count = check_damage_from_outlined_monsters();
+    if(damage_count > 0) {
+        player_lives -= damage_count;
         if(player_lives <= 0) {
+            player_lives = 0; // Don't go below 0
             game_over = true;
         }
     }
