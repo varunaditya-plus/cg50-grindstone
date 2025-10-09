@@ -23,6 +23,8 @@ set(SOURCES
   src/chain.h
   src/grindstone.c
   src/grindstone.h
+  src/font.c
+  src/font.h
 )
 # Shared assets, fx-9860G-only assets and fx-CG-50-only assets
 set(ASSETS

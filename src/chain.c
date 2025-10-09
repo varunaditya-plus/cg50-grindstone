@@ -297,6 +297,9 @@ void execute_chain(void)
         draw_chain();
         draw_monsters();
 		draw_player();
+		// Draw HUD elements
+		draw_chain_hud();
+		draw_hearts_hud();
 		dupdate();
 		// brief delay so steps are visible
 		for(volatile int d=0; d<200000; d++); // simple busy-wait
@@ -304,6 +307,18 @@ void execute_chain(void)
 
     // Clear chain state
     reset_chain_state();
+
+    // Wait 1 second before checking for damage
+    for(volatile int d=0; d<1000000; d++); // 1 second delay
+    
+    // Check for damage from outlined monsters and apply it
+    
+    if(check_damage_from_outlined_monsters()) {
+        player_lives--;
+        if(player_lives <= 0) {
+            game_over = true;
+        }
+    }
 
     // If the executed chain length was 10 or more, spawn a grindstone at random
     if(executed_len >= 10) {
@@ -320,5 +335,8 @@ void execute_chain(void)
 	add_random_outlines_after_chain();
 	draw_monsters();
 	draw_player();
+	// Draw HUD elements
+	draw_chain_hud();
+	draw_hearts_hud();
 	dupdate();
 }

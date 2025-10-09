@@ -34,5 +34,16 @@ typedef enum {
 #define COLOR_YELLOW 0xfe8b
 #define COLOR_BLUE 0x4bd2
 
+// Game state
+#define MAX_LIVES 3
+
+// Global game state variables
+extern int player_lives;
+extern bool game_over;
+
+// Function declarations
+void draw_hearts_hud(void);
+bool check_damage_from_outlined_monsters(void);
+
 #endif // GAME_H
 

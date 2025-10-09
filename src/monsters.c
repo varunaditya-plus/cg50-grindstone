@@ -53,7 +53,7 @@ static void draw_thick_shape(int x, int y, shape_type_t shape, int thickness, co
     }
 }
 
-void draw_outline_cell(int row, int col, int thickness, color_t color)
+void draw_outline_cell(int row, int col, int thickness, color_t color __attribute__((unused)))
 {
     int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
     int y = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
@@ -301,6 +301,8 @@ void animate_gravity_and_refill(void)
             draw_chain();
             draw_monsters();
             draw_player();
+            draw_chain_hud();
+            draw_hearts_hud();
             dupdate();
             // Small delay for visible falling
             for(volatile int d=0; d<80000; d++);
@@ -344,6 +346,8 @@ void animate_gravity_and_refill(void)
                     draw_grid_lines();
                     draw_monsters();
                     draw_player();
+                    draw_chain_hud();
+                    draw_hearts_hud();
                     dupdate();
                     for(volatile int d=0; d<80000; d++);
                 } else {

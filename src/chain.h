@@ -14,6 +14,7 @@ bool undo_last_chain_step(void);
 void draw_chain(void);
 void execute_chain(void);
 void reset_chain_state(void);
+void draw_chain_hud(void);
 
 // Line utilities (used only here)
 void draw_line(int x0, int y0, int x1, int y1, color_t color);
