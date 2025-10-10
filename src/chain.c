@@ -217,23 +217,6 @@ bool add_chain_step(int drow, int dcol)
 	return add_chain_point(row, col);
 }
 
-bool undo_last_chain_step(void)
-{
-    if(chain_len == 0) return false;
-    chain_len--;
-    // If program removed the first colored cell, clear color/recolor state
-    if(chain_len == 0) {
-        chain_color_shape = SHAPE_COUNT;
-        chain_can_recolor = false;
-        grindstone_entered = false;
-    } else {
-        // backing up cancels any pending recolor and grindstone state
-        chain_can_recolor = false;
-        grindstone_entered = false;
-    }
-    return true;
-}
-
 void draw_line(int x0, int y0, int x1, int y1, color_t color)
 {
 	int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;

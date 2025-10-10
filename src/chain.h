@@ -10,7 +10,6 @@ extern int chain_len;
 
 bool add_chain_point(int row, int col);
 bool add_chain_step(int drow, int dcol);
-bool undo_last_chain_step(void);
 void draw_chain(void);
 void execute_chain(void);
 void reset_chain_state(void);
