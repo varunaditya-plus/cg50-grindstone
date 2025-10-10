@@ -82,43 +82,55 @@ static void draw_grindstone_icon(int cx, int cy, int size) // make better in the
 
 static void draw_heart(int x, int y, int size, color_t color)
 {
-	// Simple heart shape using two circles and a triangle
-	int half_size = size / 2;
-	
-	// Left circle
-	for(int dy = -half_size; dy <= 0; dy++) {
-		for(int dx = -half_size; dx <= 0; dx++) {
-			if(dx*dx + dy*dy <= half_size*half_size) {
-				dpixel(x + dx, y + dy, color);
-			}
-		}
-	}
-	
-	// Right circle
-	for(int dy = -half_size; dy <= 0; dy++) {
-		for(int dx = 0; dx <= half_size; dx++) {
-			if(dx*dx + dy*dy <= half_size*half_size) {
-				dpixel(x + dx, y + dy, color);
-			}
-		}
-	}
-	
-	// Triangle bottom
-	for(int dy = 0; dy <= half_size; dy++) {
-		int width = half_size - dy;
-		for(int dx = -width; dx <= width; dx++) {
-			dpixel(x + dx, y + dy, color);
-		}
-	}
+    if (size < 4) return;
+
+    int r = size / 3;
+    int offset = r;
+    int tri_h = r + (size - 2*r);
+    if (tri_h < r) tri_h = r;
+
+    int cxL = x - offset;
+    int cxR = x + offset;
+    int cy  = y;
+
+    int minX = x - (offset + r);
+    int maxX = x + (offset + r);
+    int minY = y - r;
+    int maxY = y + tri_h;
+
+    for (int py = minY; py <= maxY; ++py) {
+        for (int px = minX; px <= maxX; ++px) {
+
+            int dxL = px - cxL;
+            int dxR = px - cxR;
+            int dyC = py - cy;
+
+            int inside = 0;
+
+            if (py <= y) {
+                if (dxL*dxL + dyC*dyC <= r*r || dxR*dxR + dyC*dyC <= r*r) {
+                    inside = 1;
+                }
+            } else {
+                int dy = py - y;
+                int hw = ( (offset + r) * (tri_h - dy) ) / tri_h;
+                if (px >= x - hw && px <= x + hw) {
+                    inside = 1;
+                }
+            }
+
+            if (inside) dpixel(px, py, color);
+        }
+    }
 }
+
 
 void draw_hearts_hud(void)
 {
-	int margin = 6;
-	int heart_size = 8;
-	int spacing = 4;
-	int start_x = margin;
-	int start_y = margin;
+	int heart_size = 20;
+	int spacing = 8;
+	int start_x = 26;
+	int start_y = 35;
 	
 	for(int i = 0; i < MAX_LIVES; i++) {
 		int x = start_x + i * (heart_size + spacing);
