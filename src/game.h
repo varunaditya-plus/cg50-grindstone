@@ -33,6 +33,21 @@ typedef enum {
 #define COLOR_GREEN 0x9dee
 #define COLOR_YELLOW 0xfe8b
 #define COLOR_BLUE 0x4bd2
+#define COLOR_ORANGE 0xFC60
+#define COLOR_CYAN   0x07FF
+#define COLOR_BLACK  0x0000
+#define COLOR_WHITE  0xFFFF
+
+//blue
+#define COLOR_BLUE_DARK   0x2A49
+#define COLOR_EYE_PALE    0xFEE6
+#define COLOR_MOUTH_PINK  0xF88B
+
+//green
+#define COLOR_GREEN_DARK  0x7DCC  // darker green shade for shadows/fin/legs
+#define COLOR_IVORY       0xFFDD  // for teeth
+
+
 
 // Game state
 #define MAX_LIVES 3
