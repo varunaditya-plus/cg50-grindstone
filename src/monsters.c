@@ -267,20 +267,20 @@ void draw_circle(int cx, int cy, int r, color_t color)
     int disk_y  = cy + (r * 4 / 10);
     int disk_dx = r;
     // Left disk
-    fill_circle(cx - disk_dx, disk_y, disk_r, BODY);
-    fill_circle(cx - disk_dx, disk_y, disk_r - 5, FACE);
-    fill_circle(cx - disk_dx, disk_y, disk_r - 10, BODY);
-    fill_circle(cx - disk_dx, disk_y, disk_r - 15, FACE);
+    fill_circle(cx - disk_dx, disk_y, disk_r, COLOR_RED_DARK);
+    fill_circle(cx - disk_dx, disk_y, disk_r - 5, COLOR_RED_DARK);
+    fill_circle(cx - disk_dx, disk_y, disk_r - 10, COLOR_RED_DARK);
+    fill_circle(cx - disk_dx, disk_y, disk_r - 15, COLOR_RED_DARK);
     // Right disk
-    fill_circle(cx + disk_dx, disk_y, disk_r, BODY);
-    fill_circle(cx + disk_dx, disk_y, disk_r - 5, FACE);
-    fill_circle(cx + disk_dx, disk_y, disk_r - 10, BODY);
-    fill_circle(cx + disk_dx, disk_y, disk_r - 15, FACE);
+    fill_circle(cx + disk_dx, disk_y, disk_r, COLOR_RED_DARK);
+    fill_circle(cx + disk_dx, disk_y, disk_r - 5, COLOR_RED_DARK);
+    fill_circle(cx + disk_dx, disk_y, disk_r - 10, COLOR_RED_DARK);
+    fill_circle(cx + disk_dx, disk_y, disk_r - 15, COLOR_RED_DARK);
 
     // --- FEET ---
-    int foot_r = r * 12 / 100;
-    fill_circle(cx - (r * 2 / 10), cy + (r * 9 / 10), foot_r, BODY);
-    fill_circle(cx + (r * 2 / 10), cy + (r * 9 / 10), foot_r, BODY);
+    int foot_r = r * 15 / 100;
+    fill_circle(cx - (r * 4 / 10), cy + (r * 11 / 10), foot_r, BODY);
+    fill_circle(cx + (r * 4 / 10), cy + (r * 11 / 10), foot_r, BODY);
 
     #undef IN_BOUNDS
 }
@@ -410,8 +410,8 @@ void draw_oval(int x, int y, int width, int height, color_t color __attribute__(
 
     int cx = x + width / 2;
     int cy = y + height / 2;
-    int rx = width / 2;
-    int ry = height / 2;
+    int rx = (width * 2) / 3;
+    int ry = (height * 2) / 3;
 
     // Helpers
     #define IN_BOUNDS(px,py) ((px) >= 0 && (px) < SCREEN_WIDTH && (py) >= 0 && (py) < SCREEN_HEIGHT)
@@ -456,10 +456,12 @@ void draw_oval(int x, int y, int width, int height, color_t color __attribute__(
     draw_triangle(cx + rx/3, cy - ry - spike_h/3, spike_h, ORANGE);
 
     // --- HUGE SIDE EYES ---
-    int eye_rx = rx * 3 / 5;
-    int eye_ry = ry * 3 / 5;
-    int eye_y  = cy - ry / 5;
-    int eye_dx = rx * 5 / 4;
+    int orig_rx = width / 2;
+    int orig_ry = height / 2;
+    int eye_rx = orig_rx * 3 / 5;
+    int eye_ry = orig_ry * 3 / 5;
+    int eye_y  = cy - orig_ry / 5;
+    int eye_dx = orig_rx * 5 / 4;
 
     // White eyes
     fill_ellipse(cx - eye_dx, eye_y, eye_rx, eye_ry, WHITE);
@@ -472,8 +474,8 @@ void draw_oval(int x, int y, int width, int height, color_t color __attribute__(
     fill_ellipse(cx + eye_dx, eye_y, pup_rx, pup_ry, ORANGE);
 
     // --- MOUTH ---
-    int mouth_rx = rx / 5;
-    int mouth_ry = ry / 2;
+    int mouth_rx = rx / 6;  // Smaller width
+    int mouth_ry = ry / 3;  // Smaller height
     int mouth_y  = cy + ry / 8;
     fill_ellipse(cx, mouth_y, mouth_rx + 2, mouth_ry + 2, CYAN);
     fill_ellipse(cx, mouth_y, mouth_rx, mouth_ry, BLACK);
@@ -493,7 +495,7 @@ void draw_oval(int x, int y, int width, int height, color_t color __attribute__(
 
     // --- FEET ---
     int leg_h = ry / 2;
-    int leg_y = cy + ry;
+    int leg_y = cy + ry * 4 / 5;  // Move feet up by 25%
     for (int i = -2; i <= 2; i += 2) {
         int lx = cx + i * (rx / 3);
         for (int py = 0; py < leg_h; py++)

@@ -47,7 +47,8 @@ typedef enum {
 #define COLOR_GREEN_DARK  0x7DCC  // darker green shade for shadows/fin/legs
 #define COLOR_IVORY       0xFFDD  // for teeth
 
-
+//red
+#define COLOR_RED_DARK 0xA208
 
 // Game state
 #define MAX_LIVES 3
