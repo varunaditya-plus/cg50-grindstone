@@ -703,6 +703,7 @@ void animate_gravity_and_refill(void)
         // Draw intermediate frame if anything moved
         if(moved) {
             draw_background();
+            draw_grid_background();
             draw_grid_lines();
             draw_chain();
             draw_monsters();
@@ -749,6 +750,7 @@ void animate_gravity_and_refill(void)
                     grid[r][col] = CREEP_COUNT;
                     r = below;
                     draw_background();
+                    draw_grid_background();
                     draw_grid_lines();
                     draw_monsters();
                     draw_player();

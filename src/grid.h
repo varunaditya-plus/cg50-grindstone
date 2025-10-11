@@ -5,6 +5,7 @@
 #include "game.h"
 
 void draw_background(void);
+void draw_grid_background(void);
 void draw_grid_lines(void);
 
 #endif // GRID_H

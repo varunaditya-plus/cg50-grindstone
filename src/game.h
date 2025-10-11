@@ -28,7 +28,7 @@ typedef enum {
 } creep_type_t;
 
 // Colors (RGB565 format)
-#define COLOR_BACKGROUND 0x31c8
+#define COLOR_BACKGROUND 0x2966
 #define COLOR_RED 0xf2ab
 #define COLOR_GREEN 0x9dee
 #define COLOR_YELLOW 0xfe8b
@@ -49,6 +49,10 @@ typedef enum {
 
 //red
 #define COLOR_RED_DARK 0xA208
+
+// Grid colors
+#define COLOR_GRID 0x424a
+#define COLOR_GRID_BACKGROUND 0x2125
 
 // Game state
 #define MAX_LIVES 3

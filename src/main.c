@@ -219,6 +219,7 @@ int main(void)
     grindstone_clear_all();
     randomize_grid();
     clear_all_outlines();
+    draw_grid_background();
     draw_grid_lines();
     draw_chain();
     draw_monsters();
@@ -302,6 +303,7 @@ int main(void)
 
         if(needs_redraw) {
             draw_background();
+            draw_grid_background();
             draw_grid_lines();
             draw_chain();
             draw_monsters();

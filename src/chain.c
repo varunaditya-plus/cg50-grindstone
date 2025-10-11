@@ -275,6 +275,7 @@ void execute_chain(void)
         }
 		// Redraw frame
 		draw_background();
+		draw_grid_background();
 		draw_grid_lines();
         // Chain behind entities
         draw_chain();
@@ -314,6 +315,7 @@ void execute_chain(void)
 
 	// Redraw everything
 	draw_background();
+	draw_grid_background();
 	draw_grid_lines();
 	// After resolving the board, mark new outlined monsters for next round
 	add_random_outlines_after_chain();
