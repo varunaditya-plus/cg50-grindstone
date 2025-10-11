@@ -8,7 +8,7 @@
 #include "grindstone.h"
 
 bool chain_planning = true;
-shape_type_t chain_color_shape = SHAPE_COUNT;
+creep_type_t chain_color_shape = CREEP_COUNT;
 int chain_len = 0;
 static int chain_rows[GRID_SIZE * GRID_SIZE];
 static int chain_cols[GRID_SIZE * GRID_SIZE];
@@ -84,7 +84,7 @@ void draw_chain(void)
         }
     }
     // color can change after grindstone the moment we move into a non-grindstone cell when recolor is pending.
-    shape_type_t current_shape = SHAPE_COUNT;
+    creep_type_t current_shape = CREEP_COUNT;
     bool recolor_pending = false;
     for(int i = start_index; i < chain_len; i++) {
 		int row = chain_rows[i];
@@ -92,12 +92,12 @@ void draw_chain(void)
 		int cx, cy;
 		get_cell_center(row, col, &cx, &cy);
         bool is_grind = grindstone_is_at(row, col);
-        shape_type_t cell_shape = grid[row][col];
+        creep_type_t cell_shape = grid[row][col];
         if(is_grind) {
             // Hitting a grindstone schedules a recolor on the next colored cell
             recolor_pending = true;
-        } else if(cell_shape != SHAPE_COUNT) {
-            if(current_shape == SHAPE_COUNT) {
+        } else if(cell_shape != CREEP_COUNT) {
+            if(current_shape == CREEP_COUNT) {
                 current_shape = cell_shape;
             } else if(recolor_pending) {
                 current_shape = cell_shape;
@@ -105,9 +105,9 @@ void draw_chain(void)
             }
         }
         // Fallback color if no color has been established yet
-        color_t seg_color = (current_shape == SHAPE_COUNT)
+        color_t seg_color = (current_shape == CREEP_COUNT)
             ? lighten_color(COLOR_BLUE)
-            : lighten_color(shape_to_color(current_shape));
+            : lighten_color(creep_to_color(current_shape));
         int dx = cx - prev_x;
         int dy = cy - prev_y;
         int dirx = (dx > 0) - (dx < 0);
@@ -154,7 +154,7 @@ bool add_chain_point(int row, int col)
 	}
 
     bool is_grind = grindstone_is_at(row, col);
-    shape_type_t s = grid[row][col];
+    creep_type_t s = grid[row][col];
     if(is_grind) {
         // Entering a grindstone - mark that we're inside one
         grindstone_entered = true;
@@ -167,8 +167,8 @@ bool add_chain_point(int row, int col)
         }
         
         // Cannot step on empty unless it's a grindstone
-        if(s == SHAPE_COUNT) return false;
-        if(chain_color_shape == SHAPE_COUNT) {
+        if(s == CREEP_COUNT) return false;
+        if(chain_color_shape == CREEP_COUNT) {
             // First colored piece selects the chain color
             chain_color_shape = s;
         }
@@ -201,7 +201,7 @@ bool add_chain_step(int drow, int dcol)
 		if(row == prevprev_row && col == prevprev_col) {
 			chain_len--;
 			if(chain_len == 0) {
-				chain_color_shape = SHAPE_COUNT;
+				chain_color_shape = CREEP_COUNT;
 				chain_can_recolor = false;
 				grindstone_entered = false;
 			} else {
@@ -253,7 +253,7 @@ void draw_ortho_path(int x0, int y0, int x1, int y1, color_t color)
 void reset_chain_state(void)
 {
     chain_len = 0;
-    chain_color_shape = SHAPE_COUNT;
+    chain_color_shape = CREEP_COUNT;
     chain_can_recolor = false;
     grindstone_entered = false;
 }
@@ -271,7 +271,7 @@ void execute_chain(void)
         if(grindstone_is_at(target_row, target_col)) {
             grindstone_remove(target_row, target_col);
         } else {
-            grid[target_row][target_col] = SHAPE_COUNT;
+            grid[target_row][target_col] = CREEP_COUNT;
         }
 		// Redraw frame
 		draw_background();

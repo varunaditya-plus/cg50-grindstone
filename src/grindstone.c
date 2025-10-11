@@ -120,7 +120,7 @@ void grindstone_spawn_random(void)
 	int col = candidates[idx][1];
 
 	// Remove any monster at that cell and place grindstone
-	grid[row][col] = SHAPE_COUNT;
+	grid[row][col] = CREEP_COUNT;
 	grindstone_place(row, col);
 }
 

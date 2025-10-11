@@ -18,14 +18,14 @@
 #define PLAYER_ROW (GRID_SIZE - 1)
 #define PLAYER_COL (GRID_SIZE / 2)
 
-// Shape types
+// Creep types
 typedef enum {
-	SHAPE_CIRCLE = 0,
-	SHAPE_TRIANGLE = 1,
-	SHAPE_OVAL = 2,
-	SHAPE_SQUARE = 3,
-	SHAPE_COUNT = 4
-} shape_type_t;
+	CREEP_RED = 0,
+	CREEP_GREEN = 1,
+	CREEP_YELLOW = 2,
+	CREEP_BLUE = 3,
+	CREEP_COUNT = 4
+} creep_type_t;
 
 // Colors (RGB565 format)
 #define COLOR_BACKGROUND 0x31c8

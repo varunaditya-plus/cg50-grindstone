@@ -174,7 +174,7 @@ int check_damage_from_outlined_monsters(void)
 		   check_col < 0 || check_col >= GRID_SIZE) continue;
 		
 		// Check if there's an outlined monster at this position
-		if(outlined[check_row][check_col] && grid[check_row][check_col] != SHAPE_COUNT) {
+		if(outlined[check_row][check_col] && grid[check_row][check_col] != CREEP_COUNT) {
 			// Remove outline from this monster
 			outlined[check_row][check_col] = false;
 			damage_count++; // Count this monster as dealing damage
@@ -241,7 +241,7 @@ int main(void)
         bool needs_redraw = false;
         if(key.key == KEY_F1) {
             // Reset planning state and monsters
-            chain_color_shape = SHAPE_COUNT;
+            chain_color_shape = CREEP_COUNT;
             chain_len = 0;
             grindstone_clear_all();
             randomize_grid();
@@ -252,7 +252,7 @@ int main(void)
         }
         else if(key.key == KEY_ACON) {
             // Clear current chain
-            chain_color_shape = SHAPE_COUNT;
+            chain_color_shape = CREEP_COUNT;
             chain_len = 0;
             needs_redraw = true;
         }
@@ -263,7 +263,7 @@ int main(void)
         }
         else if(key.key == KEY_EXIT) {
             // Reset current chain on Exit
-            chain_color_shape = SHAPE_COUNT;
+            chain_color_shape = CREEP_COUNT;
             chain_len = 0;
             needs_redraw = true;
         }

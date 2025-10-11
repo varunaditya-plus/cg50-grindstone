@@ -5,7 +5,7 @@
 #include "game.h"
 
 extern bool chain_planning;
-extern shape_type_t chain_color_shape;
+extern creep_type_t chain_color_shape;
 extern int chain_len;
 
 bool add_chain_point(int row, int col);

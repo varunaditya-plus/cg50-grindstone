@@ -6,7 +6,7 @@
 #include "grindstone.h"
 #include "chain.h"
 
-shape_type_t grid[GRID_SIZE][GRID_SIZE];
+creep_type_t grid[GRID_SIZE][GRID_SIZE];
 bool outlined[GRID_SIZE][GRID_SIZE];
 bool grid_initialized = false;
 
@@ -21,7 +21,7 @@ static color_t lighten_color(color_t c)
     return (color_t)((r << 11) | (g << 5) | b);
 }
 
-static void draw_thick_shape(int x, int y, shape_type_t shape, int thickness, color_t color)
+static void draw_thick_creep(int x, int y, creep_type_t creep, int thickness, color_t color)
 {
     int size = GRID_CELL_SIZE / 2;
     int circle_size = GRID_CELL_SIZE / 3;
@@ -31,17 +31,17 @@ static void draw_thick_shape(int x, int y, shape_type_t shape, int thickness, co
         for(int dy = -t; dy <= t; dy++) {
             for(int dx = -t; dx <= t; dx++) {
                 if(dx*dx + dy*dy <= t*t) { // Only draw outline pixels
-                    switch(shape) {
-                        case SHAPE_CIRCLE:
+                    switch(creep) {
+                        case CREEP_RED:
                             draw_circle(x + dx, y + dy, circle_size, color);
                             break;
-                        case SHAPE_TRIANGLE:
+                        case CREEP_GREEN:
                             draw_triangle(x + dx, y + dy, size, color);
                             break;
-                        case SHAPE_OVAL:
+                        case CREEP_YELLOW:
                             draw_oval(x + dx - size/2, y + dy - size/2, size, size, color);
                             break;
-                        case SHAPE_SQUARE:
+                        case CREEP_BLUE:
                             draw_square(x + dx - size/2, y + dy - size/2, size, color);
                             break;
                         default:
@@ -58,30 +58,30 @@ void draw_outline_cell(int row, int col, int thickness, color_t color __attribut
     int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
     int y = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
     
-    // Get the shape's color and lighten it
-    color_t shape_color = shape_to_color(grid[row][col]);
-    color_t lighter_color = lighten_color(shape_color);
+    // Get the creep's color and lighten it
+    color_t creep_color = creep_to_color(grid[row][col]);
+    color_t lighter_color = lighten_color(creep_color);
     
-    // Draw thick outline of the monster shape
-    draw_thick_shape(x, y, grid[row][col], thickness, lighter_color);
+    // Draw thick outline of the monster creep
+    draw_thick_creep(x, y, grid[row][col], thickness, lighter_color);
 }
 
-void draw_shape(int x, int y, shape_type_t shape)
+void draw_creep(int x, int y, creep_type_t creep)
 {
 	int size = GRID_CELL_SIZE / 2;
 	int circle_size = GRID_CELL_SIZE / 3;
 
-	switch(shape) {
-		case SHAPE_CIRCLE:
+	switch(creep) {
+		case CREEP_RED:
 			draw_circle(x, y, circle_size, COLOR_RED);
 			break;
-		case SHAPE_TRIANGLE:
+		case CREEP_GREEN:
 			draw_triangle(x, y, size, COLOR_GREEN);
 			break;
-		case SHAPE_OVAL:
+		case CREEP_YELLOW:
 			draw_oval(x - size/2, y - size/2, size, size, COLOR_YELLOW);
 			break;
-		case SHAPE_SQUARE:
+		case CREEP_BLUE:
 			draw_square(x - size/2, y - size/2, size, COLOR_BLUE);
 			break;
 		default:
@@ -97,7 +97,7 @@ void draw_monsters(void)
 	for(int row = 0; row < GRID_SIZE; row++) {
 		for(int col = 0; col < GRID_SIZE; col++) {
             if(row == player_row && col == player_col) continue;
-            if(grid[row][col] == SHAPE_COUNT) continue;
+            if(grid[row][col] == CREEP_COUNT) continue;
             // Don't draw monsters on grindstone squares
             if(grindstone_is_at(row, col)) continue;
 			int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
@@ -106,8 +106,8 @@ void draw_monsters(void)
             if(outlined[row][col]) {
                 draw_outline_cell(row, col, 3, C_WHITE);
             }
-            // Draw shape on top
-			draw_shape(x, y, grid[row][col]);
+            // Draw creep on top
+			draw_creep(x, y, grid[row][col]);
 		}
 	}
 
@@ -120,20 +120,20 @@ void randomize_grid(void)
 	for(int row = 0; row < GRID_SIZE; row++) {
 		for(int col = 0; col < GRID_SIZE; col++) {
 			if(row == PLAYER_ROW && col == PLAYER_COL) continue;
-			grid[row][col] = (shape_type_t)(rand() % SHAPE_COUNT);
+			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
             outlined[row][col] = false;
 		}
 	}
 	grid_initialized = true;
 }
 
-color_t shape_to_color(shape_type_t shape)
+color_t creep_to_color(creep_type_t creep)
 {
-	switch(shape) {
-		case SHAPE_CIRCLE: return COLOR_RED;
-		case SHAPE_TRIANGLE: return COLOR_GREEN;
-		case SHAPE_OVAL: return COLOR_YELLOW;
-		case SHAPE_SQUARE: return COLOR_BLUE;
+	switch(creep) {
+		case CREEP_RED: return COLOR_RED;
+		case CREEP_GREEN: return COLOR_GREEN;
+		case CREEP_YELLOW: return COLOR_YELLOW;
+		case CREEP_BLUE: return COLOR_BLUE;
 		default: return C_WHITE;
 	}
 }
@@ -152,7 +152,7 @@ void add_random_outlines_after_chain(void)
             int col = rand() % GRID_SIZE;
             if(row == PLAYER_ROW && col == PLAYER_COL) continue;
             if(grindstone_is_at(row, col)) continue;
-            if(grid[row][col] == SHAPE_COUNT) continue;
+            if(grid[row][col] == CREEP_COUNT) continue;
             if(outlined[row][col]) continue; // keep outlines constant; avoid reselecting
             outlined[row][col] = true;
             break;
@@ -641,14 +641,14 @@ void apply_gravity_and_refill(void)
 			// Skip grindstone squares - they stay empty
 			if(grindstone_is_at(row, col)) continue;
 			// Only process non-empty squares
-			if(grid[row][col] != SHAPE_COUNT) {
+			if(grid[row][col] != CREEP_COUNT) {
 				// Find the next available position below
 				while(write_row > row && (write_row == player_row || grindstone_is_at(write_row, col))) {
 					write_row--;
 				}
 				if(write_row != row) {
 					grid[write_row][col] = grid[row][col];
-					grid[row][col] = SHAPE_COUNT;
+					grid[row][col] = CREEP_COUNT;
 				}
 				write_row--;
 				if(write_row == player_row && col == player_col) write_row--;
@@ -658,7 +658,7 @@ void apply_gravity_and_refill(void)
 		for(int row = write_row; row >= 0; row--) {
 			if(row == player_row && col == player_col) continue;
 			if(grindstone_is_at(row, col)) continue;
-			grid[row][col] = (shape_type_t)(rand() % SHAPE_COUNT);
+			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
 		}
 	}
 }
@@ -678,7 +678,7 @@ void animate_gravity_and_refill(void)
         for(int col = 0; col < GRID_SIZE; col++) {
             for(int row = GRID_SIZE - 2; row >= 0; row--) {
                 if(row == player_row && col == player_col) continue;
-                if(grid[row][col] == SHAPE_COUNT) continue;
+                if(grid[row][col] == CREEP_COUNT) continue;
                 // Don't move monsters from grindstone squares
                 if(grindstone_is_at(row, col)) continue;
                 
@@ -690,9 +690,9 @@ void animate_gravity_and_refill(void)
                     below++;
                     if(below == player_row && col == player_col) below++;
                 }
-                if(below < GRID_SIZE && grid[below][col] == SHAPE_COUNT) {
+                if(below < GRID_SIZE && grid[below][col] == CREEP_COUNT) {
                     grid[below][col] = grid[row][col];
-                    grid[row][col] = SHAPE_COUNT;
+                    grid[row][col] = CREEP_COUNT;
                     moved = true;
                 }
             }
@@ -720,17 +720,17 @@ void animate_gravity_and_refill(void)
         int empties = 0;
         for(int row = 0; row < GRID_SIZE; row++) {
             if(row == player_row && col == player_col) continue;
-            if(grid[row][col] == SHAPE_COUNT) empties++;
+            if(grid[row][col] == CREEP_COUNT) empties++;
         }
         // For each empty, spawn above the grid and slide down per step
         while(empties-- > 0) {
             // Find the first empty from top to place a new tile (skip grindstone squares)
             int spawn_row = 0;
-            while(spawn_row < GRID_SIZE && !(grid[spawn_row][col] == SHAPE_COUNT && !(spawn_row == player_row && col == player_col) && !grindstone_is_at(spawn_row, col))) {
+            while(spawn_row < GRID_SIZE && !(grid[spawn_row][col] == CREEP_COUNT && !(spawn_row == player_row && col == player_col) && !grindstone_is_at(spawn_row, col))) {
                 spawn_row++;
             }
             if(spawn_row >= GRID_SIZE) break;
-            grid[spawn_row][col] = (shape_type_t)(rand() % SHAPE_COUNT);
+            grid[spawn_row][col] = (creep_type_t)(rand() % CREEP_COUNT);
 
             // Let the spawned tile fall until it rests
             int r = spawn_row;
@@ -742,9 +742,9 @@ void animate_gravity_and_refill(void)
                     below++;
                     if(below == player_row && col == player_col) below++;
                 }
-                if(below < GRID_SIZE && grid[below][col] == SHAPE_COUNT) {
+                if(below < GRID_SIZE && grid[below][col] == CREEP_COUNT) {
                     grid[below][col] = grid[r][col];
-                    grid[r][col] = SHAPE_COUNT;
+                    grid[r][col] = CREEP_COUNT;
                     r = below;
                     draw_background();
                     draw_grid_lines();
