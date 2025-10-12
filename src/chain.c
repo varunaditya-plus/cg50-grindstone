@@ -7,6 +7,7 @@
 #include "grid.h"
 #include "grindstone.h"
 #include "bosses.h"
+#include "objects.h"
 #include "levels.h"
 
 bool chain_planning = true;
@@ -157,7 +158,12 @@ bool add_chain_point(int row, int col)
 
     bool is_grind = grindstone_is_at(row, col);
     bool is_jerk = jerk_is_at(row, col);
+    bool is_rock = rock_is_at(row, col);
     creep_type_t s = grid[row][col];
+    
+    if(is_rock) {
+        return false; // Can't pass through rocks
+    }
     
     if(is_jerk) {
         // Check if jerk is passable (chain length >= 10)
@@ -295,6 +301,7 @@ void execute_chain(void)
         // Chain behind entities
         draw_chain();
         draw_monsters();
+        objects_draw_all(); // Draw rocks
         jerk_draw();
 		draw_player();
 		// Draw HUD elements
@@ -336,6 +343,7 @@ void execute_chain(void)
 	// After resolving the board, mark new hostile monsters for next round
 	add_random_hostile_after_chain();
 	draw_monsters();
+	objects_draw_all(); // Draw rocks
 	jerk_draw();
 	draw_player();
 	// Draw HUD elements

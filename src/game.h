@@ -56,6 +56,7 @@ typedef enum {
 
 // Game state
 #define MAX_LIVES 3
+#define MAX_ROCKS 20
 
 // Global game state variables
 extern int player_lives;

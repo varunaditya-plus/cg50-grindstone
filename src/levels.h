@@ -4,11 +4,19 @@
 #include <gint/display.h>
 #include "game.h"
 
+// Position structure for rocks
+typedef struct {
+    int row;
+    int col;
+} position_t;
+
 // Level structure
 typedef struct {
     int jerk_spawn_row;
     int jerk_spawn_col;
     int monster_count;
+    int rock_count;
+    position_t* rock_positions;
     const char* name;
 } level_t;
 

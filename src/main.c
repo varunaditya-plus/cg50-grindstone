@@ -16,6 +16,7 @@
 #include "font.h"
 #include "bosses.h"
 #include "levels.h"
+#include "objects.h"
 
 // Game state
 int player_lives = MAX_LIVES;
@@ -232,15 +233,18 @@ int main(void)
     dclear(C_WHITE);
     
     levels_init();
+    objects_init();
     draw_background();
     grindstone_clear_all();
     randomize_grid();
     clear_all_hostile();
     jerk_spawn(); // Now uses level-specific spawn positions
+    objects_spawn_for_level(); // Spawn rocks for current level
     draw_grid_background();
     draw_grid_lines();
     draw_chain();
     draw_monsters();
+    objects_draw_all(); // Draw rocks
     jerk_draw();
     draw_player();
     draw_chain_hud();
@@ -275,6 +279,8 @@ int main(void)
             clear_all_hostile();
             jerk_reset();
             jerk_spawn(); // Now uses level-specific spawn positions
+            objects_reset();
+            objects_spawn_for_level(); // Spawn rocks for current level
             player_lives = MAX_LIVES; // Reset lives
             game_over = false;
             game_won = false;
@@ -290,6 +296,8 @@ int main(void)
             clear_all_hostile();
             jerk_reset();
             jerk_spawn(); // Spawn jerk at new level position
+            objects_reset();
+            objects_spawn_for_level(); // Spawn rocks for new level
             needs_redraw = true;
         }
         else if(key.key == KEY_ACON) {
@@ -390,6 +398,7 @@ int main(void)
             draw_grid_lines();
             draw_chain();
             draw_monsters();
+            objects_draw_all(); // Draw rocks
             jerk_draw();
             draw_player();
             draw_chain_hud();

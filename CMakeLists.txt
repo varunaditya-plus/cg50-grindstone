@@ -29,6 +29,8 @@ set(SOURCES
   src/bosses.h
   src/levels.c
   src/levels.h
+  src/objects.c
+  src/objects.h
 )
 # Shared assets, fx-9860G-only assets and fx-CG-50-only assets
 set(ASSETS

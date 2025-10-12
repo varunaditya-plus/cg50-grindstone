@@ -5,6 +5,7 @@
 #include "grindstone.h"
 #include "monsters.h"
 #include "player.h"
+#include "objects.h"
 
 static bool grindstone_grid[GRID_SIZE][GRID_SIZE];
 
@@ -108,6 +109,7 @@ void grindstone_spawn_random(void)
 		for(int c = 0; c < GRID_SIZE; c++) {
 			if(r == player_row && c == player_col) continue;
 			if(grindstone_grid[r][c]) continue;
+			if(rock_is_at(r, c)) continue; // Don't spawn grindstones where rocks are
 			candidates[count][0] = r;
 			candidates[count][1] = c;
 			count++;

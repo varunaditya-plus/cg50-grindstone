@@ -3,9 +3,20 @@
 #include "monsters.h"
 #include "grindstone.h"
 #include "chain.h"
+#include "objects.h"
 
 // Global level management
 int current_level = 0;
+
+// Rock position arrays for each level
+static position_t level1_rocks[] = {
+    {0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0},
+    {0, 6}, {1, 6}, {2, 6}, {3, 6}, {4, 6}, {5, 6}, {6, 6}
+};
+
+static position_t level2_rocks[] = {
+    // No rocks
+};
 
 // Level definitions
 level_t levels[] = {
@@ -14,6 +25,8 @@ level_t levels[] = {
         .jerk_spawn_row = 0,
         .jerk_spawn_col = GRID_SIZE / 2,
         .monster_count = 3,
+        .rock_count = sizeof(level1_rocks) / sizeof(level1_rocks[0]),
+        .rock_positions = level1_rocks,
         .name = "Level 1"
     },
     // Level 2: Jerk spawns in left middle
@@ -21,6 +34,8 @@ level_t levels[] = {
         .jerk_spawn_row = GRID_SIZE / 2,
         .jerk_spawn_col = 0,
         .monster_count = 3,
+        .rock_count = sizeof(level2_rocks) / sizeof(level2_rocks[0]),
+        .rock_positions = level2_rocks,
         .name = "Level 2"
     }
 };
@@ -87,6 +102,7 @@ void levels_handle_level_completion(void)
             clear_all_hostile();
             jerk_reset();
             jerk_spawn(); // Spawn jerk at new level position
+            objects_spawn_for_level(); // Spawn rocks for new level
         }
     }
 }
