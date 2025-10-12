@@ -25,6 +25,10 @@ set(SOURCES
   src/grindstone.h
   src/font.c
   src/font.h
+  src/bosses.c
+  src/bosses.h
+  src/levels.c
+  src/levels.h
 )
 # Shared assets, fx-9860G-only assets and fx-CG-50-only assets
 set(ASSETS

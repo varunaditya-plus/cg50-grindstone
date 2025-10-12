@@ -60,6 +60,7 @@ typedef enum {
 // Global game state variables
 extern int player_lives;
 extern bool game_over;
+extern bool game_won;
 
 // Function declarations
 void draw_hearts_hud(void);

@@ -14,10 +14,13 @@
 #include "chain.h"
 #include "grindstone.h"
 #include "font.h"
+#include "bosses.h"
+#include "levels.h"
 
 // Game state
 int player_lives = MAX_LIVES;
 bool game_over = false;
+bool game_won = false;
 
 // Helper function to convert number to string
 static void int_to_string(int value, char* buffer, int buffer_size)
@@ -153,6 +156,19 @@ static void draw_game_over_screen(void)
 	font_draw_text(text_x, text_y, game_over_text);
 }
 
+static void draw_game_win_screen(void)
+{
+	dclear(C_BLACK);
+	
+	// Draw "GAME WIN" text in the center
+	const char* game_win_text = "GAME WIN";
+	int text_width = strlen(game_win_text) * 8; // 8 pixels per character
+	int text_x = (SCREEN_WIDTH - text_width) / 2;
+	int text_y = SCREEN_HEIGHT / 2 - 4; // Center vertically
+	
+	font_draw_text(text_x, text_y, game_win_text);
+}
+
 int check_damage_from_hostile_monsters(void)
 {
 	int player_row, player_col;
@@ -215,14 +231,17 @@ int main(void)
     srand(time(NULL));
     dclear(C_WHITE);
     
+    levels_init();
     draw_background();
     grindstone_clear_all();
     randomize_grid();
     clear_all_hostile();
+    jerk_spawn(); // Now uses level-specific spawn positions
     draw_grid_background();
     draw_grid_lines();
     draw_chain();
     draw_monsters();
+    jerk_draw();
     draw_player();
     draw_chain_hud();
     draw_hearts_hud();
@@ -238,6 +257,13 @@ int main(void)
             continue;
         }
         
+        // Check for game win state
+        if(game_won) {
+            draw_game_win_screen();
+            dupdate();
+            continue;
+        }
+        
         // chain planning controls and randomize
         bool needs_redraw = false;
         if(key.key == KEY_F1) {
@@ -247,8 +273,23 @@ int main(void)
             grindstone_clear_all();
             randomize_grid();
             clear_all_hostile();
+            jerk_reset();
+            jerk_spawn(); // Now uses level-specific spawn positions
             player_lives = MAX_LIVES; // Reset lives
             game_over = false;
+            game_won = false;
+            needs_redraw = true;
+        }
+        else if(key.key == KEY_F2) {
+            // Advance to next level
+            levels_next_level();
+            chain_color_shape = CREEP_COUNT;
+            chain_len = 0;
+            grindstone_clear_all();
+            randomize_grid();
+            clear_all_hostile();
+            jerk_reset();
+            jerk_spawn(); // Spawn jerk at new level position
             needs_redraw = true;
         }
         else if(key.key == KEY_ACON) {
@@ -259,6 +300,23 @@ int main(void)
         }
         else if(key.key == KEY_EXE) {
             execute_chain();
+            
+            // Check if jerk damages player (if player ends up adjacent to jerk)
+            int jerk_damage = jerk_damage_player_if_adjacent();
+            if(jerk_damage > 0) {
+                player_lives -= jerk_damage;
+                if(player_lives <= 0) {
+                    player_lives = 0;
+                    game_over = true;
+                }
+                // Jerk doesn't move when it damages the player
+            } else {
+                // Only move jerk if it didn't damage the player
+                jerk_move_towards_player();
+            }
+            
+            // Check for win condition after chain execution
+            levels_handle_level_completion();
             // execute_chain handles redrawing
             continue;
         }
@@ -332,6 +390,7 @@ int main(void)
             draw_grid_lines();
             draw_chain();
             draw_monsters();
+            jerk_draw();
             draw_player();
             draw_chain_hud();
             draw_hearts_hud();

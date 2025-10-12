@@ -6,6 +6,8 @@
 #include "player.h"
 #include "grid.h"
 #include "grindstone.h"
+#include "bosses.h"
+#include "levels.h"
 
 bool chain_planning = true;
 creep_type_t chain_color_shape = CREEP_COUNT;
@@ -154,8 +156,16 @@ bool add_chain_point(int row, int col)
 	}
 
     bool is_grind = grindstone_is_at(row, col);
+    bool is_jerk = jerk_is_at(row, col);
     creep_type_t s = grid[row][col];
-    if(is_grind) {
+    
+    if(is_jerk) {
+        // Check if jerk is passable (chain length >= 10)
+        if(!jerk_is_passable()) return false;
+        // If jerk is passable, treat it like a grindstone for chain logic
+        grindstone_entered = true;
+    }
+    else if(is_grind) {
         // Entering a grindstone - mark that we're inside one
         grindstone_entered = true;
     }
@@ -267,9 +277,14 @@ void execute_chain(void)
 		int target_row = chain_rows[i];
 		int target_col = chain_cols[i];
 		set_player_pos(target_row, target_col);
-        // Remove monster or grindstone at target
+        // Remove monster, grindstone, or jerk at target
         if(grindstone_is_at(target_row, target_col)) {
             grindstone_remove(target_row, target_col);
+        } else if(jerk_is_at(target_row, target_col)) {
+            // Jerk is defeated when chain length >= 10
+            jerk_reset();
+            // Mark that jerk was killed this turn
+            levels_mark_jerk_killed();
         } else {
             grid[target_row][target_col] = CREEP_COUNT;
         }
@@ -280,6 +295,7 @@ void execute_chain(void)
         // Chain behind entities
         draw_chain();
         draw_monsters();
+        jerk_draw();
 		draw_player();
 		// Draw HUD elements
 		draw_chain_hud();
@@ -320,6 +336,7 @@ void execute_chain(void)
 	// After resolving the board, mark new hostile monsters for next round
 	add_random_hostile_after_chain();
 	draw_monsters();
+	jerk_draw();
 	draw_player();
 	// Draw HUD elements
 	draw_chain_hud();

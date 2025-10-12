@@ -151,6 +151,24 @@ void font_draw_char(int x, int y, char c)
     }
 }
 
+void font_draw_char_with_color(int x, int y, char c, color_t color)
+{
+    if (c < 32 || c > 126) return; // Invalid character
+    
+    int char_index = c - 32;
+    for (int row = 0; row < 8; row++)
+    {
+        int pixel_row = font_8x8[char_index][row];
+        for (int col = 0; col < 8; col++)
+        {
+            if (pixel_row & (0x80 >> col))
+            {
+                dpixel(x + col, y + row, color);
+            }
+        }
+    }
+}
+
 void font_draw_text(int x, int y, const char* text)
 {
     int pos_x = x;

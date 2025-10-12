@@ -5,6 +5,7 @@
 #include "player.h"
 #include "grindstone.h"
 #include "chain.h"
+#include "bosses.h"
 
 creep_type_t grid[GRID_SIZE][GRID_SIZE];
 bool hostile[GRID_SIZE][GRID_SIZE];
@@ -45,6 +46,8 @@ void draw_monsters(void)
             if(grid[row][col] == CREEP_COUNT) continue;
             // Don't draw monsters on grindstone squares
             if(grindstone_is_at(row, col)) continue;
+            // Don't draw monsters where the jerk is
+            if(jerk_is_at(row, col)) continue;
 			int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
 			int y = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
             
@@ -72,6 +75,7 @@ void randomize_grid(void)
 	for(int row = 0; row < GRID_SIZE; row++) {
 		for(int col = 0; col < GRID_SIZE; col++) {
 			if(row == PLAYER_ROW && col == PLAYER_COL) continue;
+			if(jerk_is_at(row, col)) continue;
 			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
             hostile[row][col] = false;
 		}
@@ -109,6 +113,7 @@ void add_random_hostile_after_chain(void)
             int col = rand() % GRID_SIZE;
             if(row == PLAYER_ROW && col == PLAYER_COL) continue;
             if(grindstone_is_at(row, col)) continue;
+            if(jerk_is_at(row, col)) continue;
             if(grid[row][col] == CREEP_COUNT) continue;
             if(hostile[row][col]) continue; // keep hostile constant; avoid reselecting
             hostile[row][col] = true;
@@ -600,10 +605,12 @@ void apply_gravity_and_refill(void)
 			if(row == player_row && col == player_col) continue;
 			// Skip grindstone squares - they stay empty
 			if(grindstone_is_at(row, col)) continue;
+			// Skip jerk position - jerk doesn't fall
+			if(jerk_is_at(row, col)) continue;
 			// Only process non-empty squares
 			if(grid[row][col] != CREEP_COUNT) {
 				// Find the next available position below
-				while(write_row > row && (write_row == player_row || grindstone_is_at(write_row, col))) {
+				while(write_row > row && (write_row == player_row || grindstone_is_at(write_row, col) || jerk_is_at(write_row, col))) {
 					write_row--;
 				}
 				if(write_row != row) {
@@ -616,10 +623,11 @@ void apply_gravity_and_refill(void)
 				if(write_row == player_row && col == player_col) write_row--;
 			}
 		}
-		// Refill empty spaces from top, but skip grindstone squares
+		// Refill empty spaces from top, but skip grindstone squares and jerk position
 		for(int row = write_row; row >= 0; row--) {
 			if(row == player_row && col == player_col) continue;
 			if(grindstone_is_at(row, col)) continue;
+			if(jerk_is_at(row, col)) continue;
 			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
 			hostile[row][col] = false; // New monsters are not hostile
 		}
@@ -644,12 +652,14 @@ void animate_gravity_and_refill(void)
                 if(grid[row][col] == CREEP_COUNT) continue;
                 // Don't move monsters from grindstone squares
                 if(grindstone_is_at(row, col)) continue;
+                // Don't move monsters from jerk position
+                if(jerk_is_at(row, col)) continue;
                 
                 int below = row + 1;
                 // Skip the player cell when checking the below position
                 if(below == player_row && col == player_col) below++;
-                // Skip grindstone squares when checking below
-                while(below < GRID_SIZE && grindstone_is_at(below, col)) {
+                // Skip grindstone squares and jerk position when checking below
+                while(below < GRID_SIZE && (grindstone_is_at(below, col) || jerk_is_at(below, col))) {
                     below++;
                     if(below == player_row && col == player_col) below++;
                 }
@@ -682,17 +692,18 @@ void animate_gravity_and_refill(void)
     // Finally, refill any remaining empty cells (excluding player cell) from the top,
     // animating the spawn descent to match falling behavior.
     for(int col = 0; col < GRID_SIZE; col++) {
-        // Count empties above the lowest filled cell (skipping player position)
+        // Count empties above the lowest filled cell (skipping player position and jerk)
         int empties = 0;
         for(int row = 0; row < GRID_SIZE; row++) {
             if(row == player_row && col == player_col) continue;
+            if(jerk_is_at(row, col)) continue;
             if(grid[row][col] == CREEP_COUNT) empties++;
         }
         // For each empty, spawn above the grid and slide down per step
         while(empties-- > 0) {
-            // Find the first empty from top to place a new tile (skip grindstone squares)
+            // Find the first empty from top to place a new tile (skip grindstone squares and jerk)
             int spawn_row = 0;
-            while(spawn_row < GRID_SIZE && !(grid[spawn_row][col] == CREEP_COUNT && !(spawn_row == player_row && col == player_col) && !grindstone_is_at(spawn_row, col))) {
+            while(spawn_row < GRID_SIZE && !(grid[spawn_row][col] == CREEP_COUNT && !(spawn_row == player_row && col == player_col) && !grindstone_is_at(spawn_row, col) && !jerk_is_at(spawn_row, col))) {
                 spawn_row++;
             }
             if(spawn_row >= GRID_SIZE) break;
@@ -704,8 +715,8 @@ void animate_gravity_and_refill(void)
             while(true) {
                 int below = r + 1;
                 if(below == player_row && col == player_col) below++;
-                // Skip grindstone squares when falling
-                while(below < GRID_SIZE && grindstone_is_at(below, col)) {
+                // Skip grindstone squares and jerk position when falling
+                while(below < GRID_SIZE && (grindstone_is_at(below, col) || jerk_is_at(below, col))) {
                     below++;
                     if(below == player_row && col == player_col) below++;
                 }
