@@ -272,14 +272,39 @@ int main(void)
             // Read simultaneous arrow key states to allow diagonals
             int drow = 0;
             int dcol = 0;
-            if(keydown(KEY_UP)) drow -= 1;
-            if(keydown(KEY_DOWN)) drow += 1;
-            if(keydown(KEY_LEFT)) dcol -= 1;
-            if(keydown(KEY_RIGHT)) dcol += 1;
+            
+            // shift modifier diagonals - clockwise
+            if(keydown(KEY_SHIFT)) {
+                if(keydown(KEY_UP)) {
+                    // Shift+Up = top-right diagonal
+                    drow = -1;
+                    dcol = 1;
+                }
+                else if(keydown(KEY_RIGHT)) {
+                    // Shift+Right = bottom-right diagonal
+                    drow = 1;
+                    dcol = 1;
+                }
+                else if(keydown(KEY_DOWN)) {
+                    // Shift+Down = bottom-left diagonal
+                    drow = 1;
+                    dcol = -1;
+                }
+                else if(keydown(KEY_LEFT)) {
+                    // Shift+Left = top-left diagonal
+                    drow = -1;
+                    dcol = -1;
+                }
+            }
+            else {
+                // Regular arrow key movement (existing logic)
+                if(keydown(KEY_UP)) drow -= 1;
+                if(keydown(KEY_DOWN)) drow += 1;
+                if(keydown(KEY_LEFT)) dcol -= 1;
+                if(keydown(KEY_RIGHT)) dcol += 1;
+            }
 
-            // If only one axis is pressed, give a brief grace period to catch the second key
-            if((drow != 0) ^ (dcol != 0)) {
-                // Longer grace window if starting a new chain, since timing is trickier
+            if(!keydown(KEY_SHIFT) && (drow != 0) ^ (dcol != 0)) {
                 int iterations = (chain_len == 0) ? 60000 : 8000;
                 for(volatile int i = 0; i < iterations; i++) {
                     if(dcol == 0) {
