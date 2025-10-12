@@ -7,64 +7,8 @@
 #include "chain.h"
 
 creep_type_t grid[GRID_SIZE][GRID_SIZE];
-bool outlined[GRID_SIZE][GRID_SIZE];
+bool hostile[GRID_SIZE][GRID_SIZE];
 bool grid_initialized = false;
-
-static color_t lighten_color(color_t c)
-{
-    unsigned int r = (c >> 11) & 0x1f;
-    unsigned int g = (c >> 5) & 0x3f;
-    unsigned int b = c & 0x1f;
-    r = (r + 31) >> 1;
-    g = (g + 63) >> 1;
-    b = (b + 31) >> 1;
-    return (color_t)((r << 11) | (g << 5) | b);
-}
-
-static void draw_thick_creep(int x, int y, creep_type_t creep, int thickness, color_t color)
-{
-    int size = GRID_CELL_SIZE / 2;
-    int circle_size = GRID_CELL_SIZE / 3;
-
-    // Draw thick outline by drawing the shape multiple times with slight offsets
-    for(int t = 0; t < thickness; t++) {
-        for(int dy = -t; dy <= t; dy++) {
-            for(int dx = -t; dx <= t; dx++) {
-                if(dx*dx + dy*dy <= t*t) { // Only draw outline pixels
-                    switch(creep) {
-                        case CREEP_RED:
-                            draw_circle(x + dx, y + dy, circle_size, color);
-                            break;
-                        case CREEP_GREEN:
-                            draw_triangle(x + dx, y + dy, size, color);
-                            break;
-                        case CREEP_YELLOW:
-                            draw_oval(x + dx - size/2, y + dy - size/2, size, size, color);
-                            break;
-                        case CREEP_BLUE:
-                            draw_square(x + dx - size/2, y + dy - size/2, size, color);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-    }
-}
-
-void draw_outline_cell(int row, int col, int thickness, color_t color __attribute__((unused)))
-{
-    int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
-    int y = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
-    
-    // Get the creep's color and lighten it
-    color_t creep_color = creep_to_color(grid[row][col]);
-    color_t lighter_color = lighten_color(creep_color);
-    
-    // Draw thick outline of the monster creep
-    draw_thick_creep(x, y, grid[row][col], thickness, lighter_color);
-}
 
 void draw_creep(int x, int y, creep_type_t creep)
 {
@@ -102,11 +46,18 @@ void draw_monsters(void)
             if(grindstone_is_at(row, col)) continue;
 			int x = GRID_START_X + (col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
 			int y = GRID_START_Y + (row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
-            // Draw outline first (behind the shape)
-            if(outlined[row][col]) {
-                draw_outline_cell(row, col, 3, C_WHITE);
+            
+            if(hostile[row][col]) {
+                int start_x = GRID_START_X + (col * GRID_CELL_SIZE);
+                int start_y = GRID_START_Y + (row * GRID_CELL_SIZE);
+                
+                for(int cell_y = start_y; cell_y < start_y + GRID_CELL_SIZE; cell_y++) {
+                    for(int cell_x = start_x; cell_x < start_x + GRID_CELL_SIZE; cell_x++) {
+                        dpixel(cell_x, cell_y, COLOR_GRID);
+                    }
+                }
             }
-            // Draw creep on top
+            
 			draw_creep(x, y, grid[row][col]);
 		}
 	}
@@ -121,7 +72,7 @@ void randomize_grid(void)
 		for(int col = 0; col < GRID_SIZE; col++) {
 			if(row == PLAYER_ROW && col == PLAYER_COL) continue;
 			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
-            outlined[row][col] = false;
+            hostile[row][col] = false;
 		}
 	}
 	grid_initialized = true;
@@ -138,10 +89,10 @@ color_t creep_to_color(creep_type_t creep)
 	}
 }
 
-void add_random_outlines_after_chain(void)
+void add_random_hostile_after_chain(void)
 {
     if(!grid_initialized) return;
-    // Weighted count 1-4 (favor fewer outlines): ~40%,30%,20%,10%
+    // Weighted count 1-4 (favor fewer hostile): ~40%,30%,20%,10%
     int r = rand() % 10;
     int count = (r < 4) ? 1 : (r < 7) ? 2 : (r < 9) ? 3 : 4;
     // Choose unique random cells that have monsters and are not the player or grindstones
@@ -153,18 +104,18 @@ void add_random_outlines_after_chain(void)
             if(row == PLAYER_ROW && col == PLAYER_COL) continue;
             if(grindstone_is_at(row, col)) continue;
             if(grid[row][col] == CREEP_COUNT) continue;
-            if(outlined[row][col]) continue; // keep outlines constant; avoid reselecting
-            outlined[row][col] = true;
+            if(hostile[row][col]) continue; // keep hostile constant; avoid reselecting
+            hostile[row][col] = true;
             break;
         }
     }
 }
 
-void clear_all_outlines(void)
+void clear_all_hostile(void)
 {
     for(int row = 0; row < GRID_SIZE; row++) {
         for(int col = 0; col < GRID_SIZE; col++) {
-            outlined[row][col] = false;
+            hostile[row][col] = false;
         }
     }
 }
@@ -650,7 +601,9 @@ void apply_gravity_and_refill(void)
 				}
 				if(write_row != row) {
 					grid[write_row][col] = grid[row][col];
+					hostile[write_row][col] = hostile[row][col];
 					grid[row][col] = CREEP_COUNT;
+					hostile[row][col] = false;
 				}
 				write_row--;
 				if(write_row == player_row && col == player_col) write_row--;
@@ -661,6 +614,7 @@ void apply_gravity_and_refill(void)
 			if(row == player_row && col == player_col) continue;
 			if(grindstone_is_at(row, col)) continue;
 			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
+			hostile[row][col] = false; // New monsters are not hostile
 		}
 	}
 }
@@ -694,7 +648,9 @@ void animate_gravity_and_refill(void)
                 }
                 if(below < GRID_SIZE && grid[below][col] == CREEP_COUNT) {
                     grid[below][col] = grid[row][col];
+                    hostile[below][col] = hostile[row][col];
                     grid[row][col] = CREEP_COUNT;
+                    hostile[row][col] = false;
                     moved = true;
                 }
             }
@@ -734,6 +690,7 @@ void animate_gravity_and_refill(void)
             }
             if(spawn_row >= GRID_SIZE) break;
             grid[spawn_row][col] = (creep_type_t)(rand() % CREEP_COUNT);
+            hostile[spawn_row][col] = false; // New monsters are not hostile
 
             // Let the spawned tile fall until it rests
             int r = spawn_row;
@@ -747,7 +704,9 @@ void animate_gravity_and_refill(void)
                 }
                 if(below < GRID_SIZE && grid[below][col] == CREEP_COUNT) {
                     grid[below][col] = grid[r][col];
+                    hostile[below][col] = hostile[r][col];
                     grid[r][col] = CREEP_COUNT;
+                    hostile[r][col] = false;
                     r = below;
                     draw_background();
                     draw_grid_background();

@@ -153,7 +153,7 @@ static void draw_game_over_screen(void)
 	font_draw_text(text_x, text_y, game_over_text);
 }
 
-int check_damage_from_outlined_monsters(void)
+int check_damage_from_hostile_monsters(void)
 {
 	int player_row, player_col;
 	get_player_pos(&player_row, &player_col);
@@ -173,10 +173,10 @@ int check_damage_from_outlined_monsters(void)
 		if(check_row < 0 || check_row >= GRID_SIZE || 
 		   check_col < 0 || check_col >= GRID_SIZE) continue;
 		
-		// Check if there's an outlined monster at this position
-		if(outlined[check_row][check_col] && grid[check_row][check_col] != CREEP_COUNT) {
-			// Remove outline from this monster
-			outlined[check_row][check_col] = false;
+		// Check if there's a hostile monster at this position
+		if(hostile[check_row][check_col] && grid[check_row][check_col] != CREEP_COUNT) {
+			// Remove hostile status from this monster
+			hostile[check_row][check_col] = false;
 			damage_count++; // Count this monster as dealing damage
 		}
 	}
@@ -218,7 +218,7 @@ int main(void)
     draw_background();
     grindstone_clear_all();
     randomize_grid();
-    clear_all_outlines();
+    clear_all_hostile();
     draw_grid_background();
     draw_grid_lines();
     draw_chain();
@@ -246,7 +246,7 @@ int main(void)
             chain_len = 0;
             grindstone_clear_all();
             randomize_grid();
-            clear_all_outlines();
+            clear_all_hostile();
             player_lives = MAX_LIVES; // Reset lives
             game_over = false;
             needs_redraw = true;

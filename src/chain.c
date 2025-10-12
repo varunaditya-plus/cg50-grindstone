@@ -295,8 +295,8 @@ void execute_chain(void)
     // Wait 1 second before checking for damage
     for(volatile int d=0; d<1000000; d++); // 1 second delay
     
-    // Check for damage from outlined monsters and apply it
-    int damage_count = check_damage_from_outlined_monsters();
+    // Check for damage from hostile monsters and apply it
+    int damage_count = check_damage_from_hostile_monsters();
     if(damage_count > 0) {
         player_lives -= damage_count;
         if(player_lives <= 0) {
@@ -317,8 +317,8 @@ void execute_chain(void)
 	draw_background();
 	draw_grid_background();
 	draw_grid_lines();
-	// After resolving the board, mark new outlined monsters for next round
-	add_random_outlines_after_chain();
+	// After resolving the board, mark new hostile monsters for next round
+	add_random_hostile_after_chain();
 	draw_monsters();
 	draw_player();
 	// Draw HUD elements

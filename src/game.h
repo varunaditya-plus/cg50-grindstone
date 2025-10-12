@@ -63,7 +63,7 @@ extern bool game_over;
 
 // Function declarations
 void draw_hearts_hud(void);
-int check_damage_from_outlined_monsters(void);
+int check_damage_from_hostile_monsters(void);
 
 #endif // GAME_H
 
