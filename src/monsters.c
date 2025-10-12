@@ -6,6 +6,7 @@
 #include "grindstone.h"
 #include "chain.h"
 #include "bosses.h"
+#include "levels.h"
 
 creep_type_t grid[GRID_SIZE][GRID_SIZE];
 bool hostile[GRID_SIZE][GRID_SIZE];
@@ -72,11 +73,15 @@ void draw_monsters(void)
 
 void randomize_grid(void)
 {
+	// Get the number of monster types for level
+	int monster_count = levels_get_monster_count();
+	
 	for(int row = 0; row < GRID_SIZE; row++) {
 		for(int col = 0; col < GRID_SIZE; col++) {
 			if(row == PLAYER_ROW && col == PLAYER_COL) continue;
 			if(jerk_is_at(row, col)) continue;
-			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
+			// Use level-specific monster count
+			grid[row][col] = (creep_type_t)(rand() % monster_count);
             hostile[row][col] = false;
 		}
 	}
@@ -628,7 +633,7 @@ void apply_gravity_and_refill(void)
 			if(row == player_row && col == player_col) continue;
 			if(grindstone_is_at(row, col)) continue;
 			if(jerk_is_at(row, col)) continue;
-			grid[row][col] = (creep_type_t)(rand() % CREEP_COUNT);
+			grid[row][col] = (creep_type_t)(rand() % levels_get_monster_count());
 			hostile[row][col] = false; // New monsters are not hostile
 		}
 	}
@@ -707,7 +712,7 @@ void animate_gravity_and_refill(void)
                 spawn_row++;
             }
             if(spawn_row >= GRID_SIZE) break;
-            grid[spawn_row][col] = (creep_type_t)(rand() % CREEP_COUNT);
+            grid[spawn_row][col] = (creep_type_t)(rand() % levels_get_monster_count());
             hostile[spawn_row][col] = false; // New monsters are not hostile
 
             // Let the spawned tile fall until it rests

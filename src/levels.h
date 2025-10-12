@@ -8,6 +8,7 @@
 typedef struct {
     int jerk_spawn_row;
     int jerk_spawn_col;
+    int monster_count;
     const char* name;
 } level_t;
 
@@ -25,5 +26,8 @@ int levels_get_count(void);
 void levels_mark_jerk_killed(void);
 bool levels_check_win_condition(void);
 void levels_handle_level_completion(void);
+
+// Monster configuration
+int levels_get_monster_count(void);
 
 #endif // LEVELS_H

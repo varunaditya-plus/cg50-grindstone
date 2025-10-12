@@ -9,16 +9,18 @@ int current_level = 0;
 
 // Level definitions
 level_t levels[] = {
-    // Level 1: Jerk spawns in top middle
+    // Level 1: Jerk spawns in top middle, 3 monster types
     {
-        .jerk_spawn_row = 0,                    // Top row
-        .jerk_spawn_col = GRID_SIZE / 2,        // Middle column
+        .jerk_spawn_row = 0,
+        .jerk_spawn_col = GRID_SIZE / 2,
+        .monster_count = 3,
         .name = "Level 1"
     },
     // Level 2: Jerk spawns in left middle
     {
-        .jerk_spawn_row = GRID_SIZE / 2,        // Middle row
-        .jerk_spawn_col = 0,                    // Left column
+        .jerk_spawn_row = GRID_SIZE / 2,
+        .jerk_spawn_col = 0,
+        .monster_count = 3,
         .name = "Level 2"
     }
 };
@@ -87,4 +89,15 @@ void levels_handle_level_completion(void)
             jerk_spawn(); // Spawn jerk at new level position
         }
     }
+}
+
+int levels_get_monster_count(void)
+{
+    level_t* current = levels_get_current();
+    int count = current->monster_count;
+    
+    if(count < 1) count = 1;
+    if(count > 4) count = 4;
+    
+    return count;
 }
