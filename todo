@@ -1,0 +1,3 @@
+fix - going into grindstone and then monster, and going out keeps the color of that monster instead of reverting to the color before.
+- add levels
+- add jerks

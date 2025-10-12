@@ -9,6 +9,7 @@
 creep_type_t grid[GRID_SIZE][GRID_SIZE];
 bool hostile[GRID_SIZE][GRID_SIZE];
 bool grid_initialized = false;
+static int move_count = 0;
 
 void draw_creep(int x, int y, creep_type_t creep)
 {
@@ -92,6 +93,11 @@ color_t creep_to_color(creep_type_t creep)
 void add_random_hostile_after_chain(void)
 {
     if(!grid_initialized) return;
+    
+    // Skip adding hostile monsters for the first 2 moves
+    move_count++;
+    if(move_count <= 2) return;
+    
     // Weighted count 1-4 (favor fewer hostile): ~40%,30%,20%,10%
     int r = rand() % 10;
     int count = (r < 4) ? 1 : (r < 7) ? 2 : (r < 9) ? 3 : 4;
@@ -118,6 +124,7 @@ void clear_all_hostile(void)
             hostile[row][col] = false;
         }
     }
+    move_count = 0;
 }
 
 void draw_circle(int cx, int cy, int r, color_t color)
