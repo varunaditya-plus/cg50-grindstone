@@ -28,7 +28,7 @@ typedef enum {
 } creep_type_t;
 
 // Colors (RGB565 format)
-#define COLOR_BACKGROUND 0x2966
+#define COLOR_BACKGROUND 0x2167
 #define COLOR_RED 0xf2ab
 #define COLOR_GREEN 0x9dee
 #define COLOR_YELLOW 0xfe8b
@@ -49,6 +49,18 @@ typedef enum {
 
 //red
 #define COLOR_RED_DARK 0xA208
+
+// player
+#define COLOR_PLAYER_SKIN     0x259B
+#define COLOR_PLAYER_FACE     0x0011
+#define COLOR_PLAYER_EYE_WHITE 0xFFFF
+#define COLOR_PLAYER_EYE_RED   0xF800
+#define COLOR_PLAYER_MOUTH     0xBA80
+#define COLOR_PLAYER_PANTS     0x49A8
+#define COLOR_PLAYER_LEG       0x0841
+#define COLOR_PLAYER_HAND      0x2104
+#define COLOR_PLAYER_OUTLINE   0x0000
+#define COLOR_PLAYER_MOUSTACHE 0xFBA0
 
 // Grid colors
 #define COLOR_GRID 0x424a

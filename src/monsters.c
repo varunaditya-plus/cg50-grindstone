@@ -694,8 +694,6 @@ void animate_gravity_and_refill(void)
         // Draw intermediate frame if anything moved
         if(moved) {
             draw_background();
-            draw_grid_background();
-            draw_grid_lines();
             draw_chain();
             draw_monsters();
             objects_draw_all(); // Draw rocks
@@ -748,8 +746,6 @@ void animate_gravity_and_refill(void)
                     hostile[r][col] = false;
                     r = below;
                     draw_background();
-                    draw_grid_background();
-                    draw_grid_lines();
                     draw_chain();
                     draw_monsters();
                     objects_draw_all(); // Draw rocks

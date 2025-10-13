@@ -255,8 +255,6 @@ int main(void)
     clear_all_hostile();
     jerk_spawn(); // Now uses level-specific spawn positions
     objects_spawn_for_level(); // Spawn rocks for current level
-    draw_grid_background();
-    draw_grid_lines();
     draw_chain();
     draw_monsters();
     objects_draw_all(); // Draw rocks
@@ -392,8 +390,6 @@ int main(void)
 
         if(needs_redraw) {
             draw_background();
-            draw_grid_background();
-            draw_grid_lines();
             draw_chain();
             draw_monsters();
             objects_draw_all(); // Draw rocks
