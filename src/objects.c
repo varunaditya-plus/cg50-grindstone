@@ -58,23 +58,45 @@ void objects_spawn_for_level(void)
     active_rock_count = rock_index;
 }
 
+static void draw_rock(int x, int y, int size)
+{
+    int w = size * 0.7; 
+    int h = size * 0.65;
+
+    int offset_x = x + (size - w) / 2;
+    int offset_y = y + (size - h) / 2;
+
+    // Top face — medium blue-gray
+    for(int dy = 0; dy < h / 2; dy++) {
+        int left = offset_x + dy / 3;
+        int right = offset_x + w - dy / 3;
+        dline(left, offset_y + dy, right, offset_y + dy, COLOR_ROCK_TOP);
+    }
+
+    // Left face — dark navy-blue
+    for(int dy = h / 2; dy < h; dy++) {
+        int lx1 = offset_x + dy / 3;
+        int lx2 = offset_x + w / 2;
+        dline(lx1, offset_y + dy, lx2, offset_y + dy, COLOR_ROCK_LEFT);
+    }
+
+    // Right face — darker blue-gray
+    for(int dy = h / 2; dy < h; dy++) {
+        int rx1 = offset_x + w / 2;
+        int rx2 = offset_x + w - dy / 3;
+        dline(rx1, offset_y + dy, rx2, offset_y + dy, COLOR_ROCK_RIGHT);
+    }
+}
+
 void objects_draw_all(void)
 {
     for(int i = 0; i < MAX_ROCKS; i++) {
         if(!rocks[i].active) continue;
         
-        // Draw rock as a gray square
         int x = GRID_START_X + (rocks[i].col * GRID_CELL_SIZE);
         int y = GRID_START_Y + (rocks[i].row * GRID_CELL_SIZE);
-        
-        // Draw a gray square for the rock
-        for(int py = y; py < y + GRID_CELL_SIZE; py++) {
-            for(int px = x; px < x + GRID_CELL_SIZE; px++) {
-                if(px >= 0 && px < SCREEN_WIDTH && py >= 0 && py < SCREEN_HEIGHT) {
-                    dpixel(px, py, COLOR_GRID); // Use grid color for rocks
-                }
-            }
-        }
+
+        draw_rock(x, y, GRID_CELL_SIZE);
     }
 }
 

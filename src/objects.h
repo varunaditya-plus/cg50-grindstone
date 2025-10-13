@@ -22,4 +22,10 @@ rock_t* objects_get_rock(int index);
 // global rock array
 extern rock_t rocks[MAX_ROCKS];
 
+// Rock colors
+#define COLOR_ROCK_TOP     0x3A6A
+#define COLOR_ROCK_LEFT    0x21E8
+#define COLOR_ROCK_RIGHT   0x18C6
+#define COLOR_ROCK_SHADOW  0x0841
+
 #endif // OBJECTS_H
