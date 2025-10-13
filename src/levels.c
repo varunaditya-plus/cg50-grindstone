@@ -27,7 +27,8 @@ level_t levels[] = {
         .monster_count = 3,
         .rock_count = sizeof(level1_rocks) / sizeof(level1_rocks[0]),
         .rock_positions = level1_rocks,
-        .name = "Level 1"
+        .name = "Level 1",
+        .win_condition_text = "KILL ALL JERKS"
     },
     // Level 2: Jerk spawns in left middle
     {
@@ -36,7 +37,8 @@ level_t levels[] = {
         .monster_count = 3,
         .rock_count = sizeof(level2_rocks) / sizeof(level2_rocks[0]),
         .rock_positions = level2_rocks,
-        .name = "Level 2"
+        .name = "Level 2",
+        .win_condition_text = "KILL ALL JERKS"
     }
 };
 
@@ -117,3 +119,5 @@ int levels_get_monster_count(void)
     
     return count;
 }
+
+

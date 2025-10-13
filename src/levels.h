@@ -18,6 +18,7 @@ typedef struct {
     int rock_count;
     position_t* rock_positions;
     const char* name;
+    const char* win_condition_text;
 } level_t;
 
 // Global level management

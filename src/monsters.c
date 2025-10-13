@@ -9,6 +9,9 @@
 #include "levels.h"
 #include "objects.h"
 
+// Forward declaration
+void draw_win_condition_hud(void);
+
 creep_type_t grid[GRID_SIZE][GRID_SIZE];
 bool hostile[GRID_SIZE][GRID_SIZE];
 bool grid_initialized = false;
@@ -699,6 +702,7 @@ void animate_gravity_and_refill(void)
             draw_player();
             draw_chain_hud();
             draw_hearts_hud();
+            draw_win_condition_hud();
             dupdate();
             // Small delay for visible falling
             for(volatile int d=0; d<80000; d++);
@@ -752,6 +756,7 @@ void animate_gravity_and_refill(void)
                     draw_player();
                     draw_chain_hud();
                     draw_hearts_hud();
+                    draw_win_condition_hud();
                     dupdate();
                     for(volatile int d=0; d<80000; d++);
                 } else {

@@ -10,6 +10,9 @@
 #include "objects.h"
 #include "levels.h"
 
+// Forward declaration
+void draw_win_condition_hud(void);
+
 bool chain_planning = true;
 creep_type_t chain_color_shape = CREEP_COUNT;
 int chain_len = 0;
@@ -307,6 +310,7 @@ void execute_chain(void)
 		// Draw HUD elements
 		draw_chain_hud();
 		draw_hearts_hud();
+		draw_win_condition_hud();
 		dupdate();
 		// brief delay so steps are visible
 		for(volatile int d=0; d<200000; d++); // simple busy-wait
@@ -349,5 +353,6 @@ void execute_chain(void)
 	// Draw HUD elements
 	draw_chain_hud();
 	draw_hearts_hud();
+	draw_win_condition_hud();
 	dupdate();
 }

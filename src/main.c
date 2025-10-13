@@ -143,6 +143,21 @@ void draw_hearts_hud(void)
 	}
 }
 
+void draw_win_condition_hud(void)
+{
+	level_t* current = levels_get_current();
+	if(current && current->win_condition_text) {
+		// Top-right placement with margin
+		int margin = 6;
+		int text_width = strlen(current->win_condition_text) * 8; // 8 pixels per character
+		int x = SCREEN_WIDTH - margin - text_width;
+		int y = margin;
+		
+		// Draw win condition text using font
+		font_draw_text(x, y, current->win_condition_text);
+	}
+}
+
 static void draw_game_over_screen(void)
 {
 	// Clear screen
@@ -249,6 +264,7 @@ int main(void)
     draw_player();
     draw_chain_hud();
     draw_hearts_hud();
+    draw_win_condition_hud();
     dupdate();
     
     while(1) {
@@ -403,6 +419,7 @@ int main(void)
             draw_player();
             draw_chain_hud();
             draw_hearts_hud();
+            draw_win_condition_hud();
         }
         
         // Update display
