@@ -324,24 +324,6 @@ int main(void)
         }
         else if(key.key == KEY_EXE) {
             execute_chain();
-            
-            // Check if jerk damages player (if player ends up adjacent to jerk)
-            int jerk_damage = jerk_damage_player_if_adjacent();
-            if(jerk_damage > 0) {
-                player_lives -= jerk_damage;
-                if(player_lives <= 0) {
-                    player_lives = 0;
-                    game_over = true;
-                }
-                // Jerk doesn't move when it damages the player
-            } else {
-                // Only move jerk if it didn't damage the player
-                jerk_move_towards_player();
-            }
-            
-            // Check for win condition after chain execution
-            levels_handle_level_completion();
-            // execute_chain handles redrawing
             continue;
         }
         else if(key.key == KEY_EXIT) {

@@ -10,8 +10,15 @@
 #include "objects.h"
 #include "levels.h"
 
-// Forward declaration
+// Forward declarations
 void draw_win_condition_hud(void);
+int jerk_damage_player_if_adjacent(void);
+void jerk_move_towards_player(void);
+void levels_handle_level_completion(void);
+
+// External variables
+extern int player_lives;
+extern bool game_over;
 
 bool chain_planning = true;
 creep_type_t chain_color_shape = CREEP_COUNT;
@@ -339,6 +346,23 @@ void execute_chain(void)
 
     // Apply animated gravity/refill (treats grindstones as solid)
     animate_gravity_and_refill();
+
+    // Check if jerk damages player (if player ends up adjacent to jerk)
+    int jerk_damage = jerk_damage_player_if_adjacent();
+    if(jerk_damage > 0) {
+        player_lives -= jerk_damage;
+        if(player_lives <= 0) {
+            player_lives = 0;
+            game_over = true;
+        }
+        // Jerk doesn't move when it damages the player
+    } else {
+        // Only move jerk if it didn't damage the player
+        jerk_move_towards_player();
+    }
+    
+    // Check for win condition after chain execution
+    levels_handle_level_completion();
 
 	// Redraw everything
 	draw_background();
