@@ -13,6 +13,8 @@ static int creeps_smashed_this_level = 0;
 // Multi-jerk tracking
 static int remaining_jerks_this_level = 0;
 static int jerk_spawns_given_this_level = 0;
+static position_t* current_jerk_spawns = NULL;
+static int current_jerk_spawn_count = 0;
 
 // Rock position arrays for each level
 // Level 1
@@ -56,13 +58,20 @@ static position_t level5_rocks[] = {
     {GRID_SIZE-2,0},{GRID_SIZE-2,GRID_SIZE-1}
 };
 
+// Jerk spawn arrays per level (sequential)
+static position_t level1_jerk_spawns[] = {};
+static position_t level2_jerk_spawns[] = {};
+static position_t level3_jerk_spawns[] = {{0, GRID_SIZE/2}};
+static position_t level4_jerk_spawns[] = {{0,0}, {0, GRID_SIZE-1}};
+static position_t level5_jerk_spawns[] = {{GRID_SIZE-1,0}, {GRID_SIZE-1, GRID_SIZE-1}};
+
 // Level definitions
 level_t levels[] = {
     // Level 1: No jerk, smash 30 creeps, rocks on sides and top
     {
-        .jerk_spawn_row = 0,
-        .jerk_spawn_col = GRID_SIZE / 2,
         .jerk_enabled = false,
+        .jerk_spawns = level1_jerk_spawns,
+        .jerk_spawn_count = 0,
         .monster_count = 3,
         .rock_count = sizeof(level1_rocks) / sizeof(level1_rocks[0]),
         .rock_positions = level1_rocks,
@@ -72,9 +81,9 @@ level_t levels[] = {
     },
     // Level 2: No jerk, smash 60 creeps, rocks on sides
     {
-        .jerk_spawn_row = GRID_SIZE / 2,
-        .jerk_spawn_col = 0,
         .jerk_enabled = false,
+        .jerk_spawns = level2_jerk_spawns,
+        .jerk_spawn_count = 0,
         .monster_count = 3,
         .rock_count = sizeof(level2_rocks) / sizeof(level2_rocks[0]),
         .rock_positions = level2_rocks,
@@ -84,9 +93,9 @@ level_t levels[] = {
     },
     // Level 3: One jerk (top middle), kill all jerks, 2x2 rocks in corners
     {
-        .jerk_spawn_row = 0,
-        .jerk_spawn_col = GRID_SIZE / 2,
         .jerk_enabled = true,
+        .jerk_spawns = level3_jerk_spawns,
+        .jerk_spawn_count = sizeof(level3_jerk_spawns) / sizeof(level3_jerk_spawns[0]),
         .monster_count = 3,
         .rock_count = sizeof(level3_rocks) / sizeof(level3_rocks[0]),
         .rock_positions = level3_rocks,
@@ -97,12 +106,9 @@ level_t levels[] = {
     ,
     // Level 4: Two jerks (top-left, top-right), kill all jerks, bottom row rocks (except middle)
     {
-        .jerk_spawn_row = 0,
-        .jerk_spawn_col = 0,
         .jerk_enabled = true,
-        .jerk2_spawn_row = 0,
-        .jerk2_spawn_col = GRID_SIZE - 1,
-        .jerk_count = 2,
+        .jerk_spawns = level4_jerk_spawns,
+        .jerk_spawn_count = sizeof(level4_jerk_spawns) / sizeof(level4_jerk_spawns[0]),
         .monster_count = 3,
         .rock_count = sizeof(level4_rocks) / sizeof(level4_rocks[0]),
         .rock_positions = level4_rocks,
@@ -113,12 +119,9 @@ level_t levels[] = {
     ,
     // Level 5: Two jerks (bottom-left, bottom-right), smash 50 creeps, rocks above bottom corners
     {
-        .jerk_spawn_row = GRID_SIZE - 1,
-        .jerk_spawn_col = 0,
         .jerk_enabled = true,
-        .jerk2_spawn_row = GRID_SIZE - 1,
-        .jerk2_spawn_col = GRID_SIZE - 1,
-        .jerk_count = 2,
+        .jerk_spawns = level5_jerk_spawns,
+        .jerk_spawn_count = sizeof(level5_jerk_spawns) / sizeof(level5_jerk_spawns[0]),
         .monster_count = 3,
         .rock_count = sizeof(level5_rocks) / sizeof(level5_rocks[0]),
         .rock_positions = level5_rocks,
@@ -135,7 +138,9 @@ void levels_init(void)
     creeps_smashed_this_level = 0;
     // reset jerk progress
     level_t* lvl = levels_get_current();
-    remaining_jerks_this_level = (lvl && lvl->jerk_enabled) ? (lvl->jerk_count > 0 ? lvl->jerk_count : 1) : 0;
+    current_jerk_spawns = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawns : NULL;
+    current_jerk_spawn_count = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawn_count : 0;
+    remaining_jerks_this_level = current_jerk_spawn_count;
     jerk_spawns_given_this_level = 0;
 }
 
@@ -150,7 +155,9 @@ void levels_next_level(void)
     creeps_smashed_this_level = 0;
     // reset jerk progress for new level
     level_t* lvl = levels_get_current();
-    remaining_jerks_this_level = (lvl && lvl->jerk_enabled) ? (lvl->jerk_count > 0 ? lvl->jerk_count : 1) : 0;
+    current_jerk_spawns = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawns : NULL;
+    current_jerk_spawn_count = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawn_count : 0;
+    remaining_jerks_this_level = current_jerk_spawn_count;
     jerk_spawns_given_this_level = 0;
 }
 
@@ -162,7 +169,9 @@ void levels_reset_to_level(int level)
         creeps_smashed_this_level = 0;
         // reset jerk progress on explicit reset
         level_t* lvl = levels_get_current();
-        remaining_jerks_this_level = (lvl && lvl->jerk_enabled) ? (lvl->jerk_count > 0 ? lvl->jerk_count : 1) : 0;
+        current_jerk_spawns = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawns : NULL;
+        current_jerk_spawn_count = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawn_count : 0;
+        remaining_jerks_this_level = current_jerk_spawn_count;
         jerk_spawns_given_this_level = 0;
     }
 }
@@ -256,5 +265,32 @@ int levels_get_remaining_smashes(void)
     if(current->target_smashes <= 0) return 0;
     int remaining = current->target_smashes - creeps_smashed_this_level;
     return (remaining > 0) ? remaining : 0;
+}
+
+
+// --- Multi-jerk spawn helpers ---
+void levels_reset_jerk_progress(void)
+{
+    level_t* lvl = levels_get_current();
+    current_jerk_spawns = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawns : NULL;
+    current_jerk_spawn_count = (lvl && lvl->jerk_enabled) ? lvl->jerk_spawn_count : 0;
+    remaining_jerks_this_level = current_jerk_spawn_count;
+    jerk_spawns_given_this_level = 0;
+}
+
+bool levels_get_next_jerk_spawn(int *row, int *col)
+{
+    if(!current_jerk_spawns) return false;
+    if(jerk_spawns_given_this_level >= current_jerk_spawn_count) return false;
+    position_t p = current_jerk_spawns[jerk_spawns_given_this_level];
+    if(row) *row = p.row;
+    if(col) *col = p.col;
+    jerk_spawns_given_this_level++;
+    return true;
+}
+
+void levels_on_jerk_spawned(void)
+{
+    // No-op for now; reserved for synchronization if needed later
 }
 

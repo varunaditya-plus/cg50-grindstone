@@ -15,10 +15,9 @@ typedef struct {
     int jerk_spawn_row;
     int jerk_spawn_col;
     bool jerk_enabled; // whether this level has a jerk boss
-    // optional second jerk for multi-jerk levels LATER: make it so you can add as many in an array or sm
-    int jerk2_spawn_row;
-    int jerk2_spawn_col;
-    int jerk_count; // number of jerks to defeat this level (0,1,2)
+    // jerk spawn positions for this level (sequential)
+    position_t* jerk_spawns;
+    int jerk_spawn_count;
     int monster_count;
     int rock_count;
     position_t* rock_positions;
