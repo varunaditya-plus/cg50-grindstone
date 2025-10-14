@@ -146,16 +146,23 @@ void draw_hearts_hud(void)
 void draw_win_condition_hud(void)
 {
 	level_t* current = levels_get_current();
-	if(current && current->win_condition_text) {
-		// Top-right placement with margin
-		int margin = 6;
-		int text_width = strlen(current->win_condition_text) * 8; // 8 pixels per character
-		int x = SCREEN_WIDTH - margin - text_width;
-		int y = margin;
-		
-		// Draw win condition text using font
-		font_draw_text(x, y, current->win_condition_text);
-	}
+    if(!current) return;
+    // Top-right placement with margin
+    int margin = 6;
+    int y = margin;
+    if(current->target_smashes > 0) {
+        // Show remaining smashes
+        int remaining = levels_get_remaining_smashes();
+        char buf[24];
+        snprintf(buf, sizeof(buf), "SMASH %d", remaining);
+        int text_width = strlen(buf) * 8;
+        int x = SCREEN_WIDTH - margin - text_width;
+        font_draw_text(x, y, buf);
+    } else if(current->win_condition_text) {
+        int text_width = strlen(current->win_condition_text) * 8;
+        int x = SCREEN_WIDTH - margin - text_width;
+        font_draw_text(x, y, current->win_condition_text);
+    }
 }
 
 static void draw_game_over_screen(void)
@@ -253,6 +260,7 @@ int main(void)
     grindstone_clear_all();
     randomize_grid();
     clear_all_hostile();
+    reset_player_pos();
     jerk_spawn(); // Now uses level-specific spawn positions
     objects_spawn_for_level(); // Spawn rocks for current level
     draw_chain();
@@ -292,12 +300,15 @@ int main(void)
             randomize_grid();
             clear_all_hostile();
             jerk_reset();
+            reset_player_pos();
             jerk_spawn(); // Now uses level-specific spawn positions
             objects_reset();
             objects_spawn_for_level(); // Spawn rocks for current level
             player_lives = MAX_LIVES; // Reset lives
             game_over = false;
             game_won = false;
+            // Reset level progress counters
+            levels_reset_to_level(current_level);
             needs_redraw = true;
         }
         else if(key.key == KEY_F2) {
@@ -309,6 +320,7 @@ int main(void)
             randomize_grid();
             clear_all_hostile();
             jerk_reset();
+            reset_player_pos();
             jerk_spawn(); // Spawn jerk at new level position
             objects_reset();
             objects_spawn_for_level(); // Spawn rocks for new level

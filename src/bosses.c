@@ -43,11 +43,29 @@ static void draw_outlined_text(int x, int y, const char* text, color_t text_colo
 void jerk_spawn(void)
 {
     if(!grid_initialized) return;
-    
-    // Get current level and spawn jerk at the specified position
+    // Respect level configuration: disable jerk if not enabled this level
     level_t* current_level = levels_get_current();
-    jerk.row = current_level->jerk_spawn_row;
-    jerk.col = current_level->jerk_spawn_col;
+    if(current_level && !current_level->jerk_enabled) {
+        jerk_reset();
+        return;
+    }
+    // Determine spawn position; for multi-jerk levels provide first then second
+    if(current_level->jerk_count >= 2 && jerk.row == 0 && jerk.col == 0 && !jerk.active) {
+        // first spawn goes to primary, second spawn to secondary
+        static int multi_spawn_index = 0;
+        if(multi_spawn_index == 0) {
+            jerk.row = current_level->jerk_spawn_row;
+            jerk.col = current_level->jerk_spawn_col;
+        } else {
+            jerk.row = current_level->jerk2_spawn_row;
+            jerk.col = current_level->jerk2_spawn_col;
+        }
+        multi_spawn_index = (multi_spawn_index + 1) % current_level->jerk_count;
+    } else {
+        // default single-jerk spawn
+        jerk.row = current_level->jerk_spawn_row;
+        jerk.col = current_level->jerk_spawn_col;
+    }
     
     // Check if the spawn position is valid (not player, not grindstone)
     if((jerk.row == PLAYER_ROW && jerk.col == PLAYER_COL) || 

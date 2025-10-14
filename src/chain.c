@@ -289,6 +289,7 @@ void execute_chain(void)
 	if(!chain_planning || chain_len == 0) return;
     // Step through each chain point, move player, delete monster at that cell
     int executed_len = chain_len;
+    int creeps_smashed_now = 0;
 	for(int i = 0; i < chain_len; i++) {
 		int target_row = chain_rows[i];
 		int target_col = chain_cols[i];
@@ -302,7 +303,10 @@ void execute_chain(void)
             // Mark that jerk was killed this turn
             levels_mark_jerk_killed();
         } else {
-            grid[target_row][target_col] = CREEP_COUNT;
+            if(grid[target_row][target_col] != CREEP_COUNT) {
+                creeps_smashed_now++;
+                grid[target_row][target_col] = CREEP_COUNT;
+            }
         }
 		// Redraw frame
 		draw_background();
@@ -340,6 +344,11 @@ void execute_chain(void)
     // If the executed chain length was 10 or more, spawn a grindstone at random
     if(executed_len >= 10) {
         grindstone_spawn_random();
+    }
+
+    // Update smash-based win progress
+    if(creeps_smashed_now > 0) {
+        levels_add_smashed(creeps_smashed_now);
     }
 
     // Apply animated gravity/refill (treats grindstones as solid)
