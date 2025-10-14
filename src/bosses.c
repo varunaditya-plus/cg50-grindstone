@@ -134,30 +134,109 @@ void jerk_move_towards_player(void)
 void jerk_draw(void)
 {
     if(!jerk.active) return;
-    
-    // Draw jerk as a black dot
-    int x = GRID_START_X + (jerk.col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
-    int y = GRID_START_Y + (jerk.row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
-    
-    // Draw a small black circle for the jerk
-    int radius = 4;
-    for(int dy = -radius; dy <= radius; dy++) {
-        for(int dx = -radius; dx <= radius; dx++) {
-            if(dx*dx + dy*dy <= radius*radius) {
-                int px = x + dx;
-                int py = y + dy;
-                if(px >= 0 && px < SCREEN_WIDTH && py >= 0 && py < SCREEN_HEIGHT) {
-                    dpixel(px, py, COLOR_BLACK);
-                }
+
+    int cx = GRID_START_X + (jerk.col * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
+    int cy = GRID_START_Y + (jerk.row * GRID_CELL_SIZE) + (GRID_CELL_SIZE / 2);
+
+    // --- Torso ---
+    for(int dy = -6; dy <= 6; dy++) {
+        int width = 12 - abs(dy); // triangle shape instead of oval
+        for(int dx = -width; dx <= width; dx++) {
+            dpixel(cx + dx, cy + dy, COLOR_JERK_BODY);
+        }
+    }
+
+    // --- Upper muscles ---
+    for(int i = -1; i <= 1; i += 2) {
+        int mx = cx + i * 9;
+        int my = cy - 2;
+        for(int dy = -4; dy <= 4; dy++) {
+            for(int dx = -4; dx <= 4; dx++) {
+                if(dx*dx + dy*dy <= 16)
+                    dpixel(mx + dx, my + dy, COLOR_JERK_HEAD);
+            }
+        }
+    }
+
+    // --- Head ---
+    int head_w = 6, head_h = 4;
+    for(int dy = -head_h; dy <= head_h; dy++) {
+        for(int dx = -head_w; dx <= head_w; dx++) {
+            if((dx*dx)/(head_w*head_w) + (dy*dy)/(head_h*head_h) <= 1)
+                dpixel(cx + dx, cy - 11 + dy, COLOR_JERK_HEAD);
+        }
+    }
+
+    // --- Horn ---
+    for(int dy = 0; dy < 4; dy++) {
+        for(int dx = -dy; dx <= dy; dx++) {
+            dpixel(cx + dx, cy - 19 + dy, COLOR_JERK_HORN);
+        }
+    }
+
+    // --- Eyes ---
+    for(int i = -1; i <= 1; i += 2) {
+        int ex = cx + i * 4;
+        int ey = cy - 12;
+        for(int dy = -1; dy <= 1; dy++) {
+            for(int dx = -3; dx <= 3; dx++) {
+                if((dx*dx)/9 + (dy*dy)/4 <= 1)
+                    dpixel(ex + dx, ey + dy, COLOR_JERK_EYES);
             }
         }
     }
     
-    // Draw "10" text with red color and white outline at bottom right
-    int text_x = x + 6; // Position to the right of the jerk
-    int text_y = y + 6; // Position below the jerk
-    draw_outlined_text(text_x, text_y, "10", COLOR_RED, COLOR_WHITE);
+    // --- Pupils ---
+    for(int i = -1; i <= 1; i += 2) {
+        int px = cx + i * 4;
+        int py = cy - 12;
+        for(int dy = -1; dy <= 1; dy++) {
+            for(int dx = -1; dx <= 1; dx++) {
+                if(dx*dx + dy*dy <= 1)
+                    dpixel(px + dx, py + dy, COLOR_JERK_PUPIL);
+            }
+        }
+    }
+
+    // --- Nipples ---
+    for(int i = -1; i <= 1; i += 2) {
+        int nx = cx + i * 6;
+        int ny = cy - 1;
+        for(int dy = -1; dy <= 1; dy++) {
+            for(int dx = -1; dx <= 1; dx++) {
+                if(dx*dx + dy*dy <= 2)
+                    dpixel(nx + dx, ny + dy, COLOR_JERK_NIPPLE);
+            }
+        }
+    }
+
+    // --- Legs ---
+    for(int i = -1; i <= 1; i += 2) {
+        int lx = cx + i * 6;
+        int ly = cy + 7;
+        for(int dy = 0; dy < 4; dy++) {
+            for(int dx = -2; dx <= 2; dx++) {
+                if(dx*dx + dy*dy <= 4)
+                    dpixel(lx + dx, ly + dy, COLOR_JERK_BODY);
+            }
+        }
+    }
+
+    // --- Arms ---
+    for(int i = -1; i <= 1; i += 2) {
+        int arm_x = cx + i * 13; // moved outward
+        int arm_y = cy - 1;
+        for(int dy = -3; dy <= 3; dy++) {
+            for(int dx = -2; dx <= 2; dx++) {
+                if(dx*dx + dy*dy <= 6)
+                    dpixel(arm_x + dx, arm_y + dy, COLOR_JERK_HEAD);
+            }
+        }
+    }
+
+    draw_outlined_text(cx + 10, cy + 6, "10", COLOR_RED, COLOR_WHITE);
 }
+
 
 void jerk_reset(void)
 {

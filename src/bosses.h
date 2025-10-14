@@ -26,4 +26,13 @@ bool jerk_was_killed(void);
 bool jerk_is_adjacent_to_player(void);
 int jerk_damage_player_if_adjacent(void);
 
+// colors
+#define COLOR_JERK_HEAD       0x5aa9
+#define COLOR_JERK_BODY       0x31c6
+#define COLOR_JERK_EYES       0xfe8b
+#define COLOR_JERK_PUPIL      0xf26a
+#define COLOR_JERK_HORN       0xddaa
+#define COLOR_JERK_NIPPLE     0xEAA0
+#define COLOR_JERK_OUTLINE    0x0000
+
 #endif // BOSSES_H
