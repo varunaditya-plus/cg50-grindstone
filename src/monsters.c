@@ -734,8 +734,8 @@ void animate_gravity_and_refill(void)
             while(true) {
                 int below = r + 1;
                 if(below == player_row && col == player_col) below++;
-                // Skip grindstone squares, jerk position, and rocks when falling
-                while(below < GRID_SIZE && (grindstone_is_at(below, col) || jerk_is_at(below, col) || rock_is_at(below, col))) {
+            // Skip grindstone squares, any jerk position, and rocks when falling
+            while(below < GRID_SIZE && (grindstone_is_at(below, col) || jerk_is_at(below, col) || rock_is_at(below, col))) {
                     below++;
                     if(below == player_row && col == player_col) below++;
                 }

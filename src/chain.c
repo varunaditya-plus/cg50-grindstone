@@ -298,10 +298,8 @@ void execute_chain(void)
         if(grindstone_is_at(target_row, target_col)) {
             grindstone_remove(target_row, target_col);
         } else if(jerk_is_at(target_row, target_col)) {
-            // Jerk is defeated when chain length >= 10
-            jerk_reset();
-            // Mark that jerk was killed this turn
-            levels_mark_jerk_killed();
+            // Jerk at this location is defeated when chain length >= 10
+            jerk_kill_at(target_row, target_col);
         } else {
             if(grid[target_row][target_col] != CREEP_COUNT) {
                 creeps_smashed_now++;

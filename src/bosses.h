@@ -12,8 +12,10 @@ typedef struct {
     bool active;
 } jerk_t;
 
-// Global jerk
-extern jerk_t jerk;
+// Multiple jerks active at once
+#define MAX_JERKS 4
+extern jerk_t jerks[MAX_JERKS];
+extern int active_jerk_count;
 extern bool jerk_killed_this_turn;
 
 void jerk_spawn(void);
@@ -25,6 +27,7 @@ bool jerk_is_passable(void);
 bool jerk_was_killed(void);
 bool jerk_is_adjacent_to_player(void);
 int jerk_damage_player_if_adjacent(void);
+void jerk_kill_at(int row, int col);
 
 // colors
 #define COLOR_JERK_HEAD       0x5aa9
