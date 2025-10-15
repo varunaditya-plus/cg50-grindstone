@@ -263,11 +263,11 @@ int main(void)
     reset_player_pos();
     jerk_spawn(); // Now uses level-specific spawn positions
     objects_spawn_for_level(); // Spawn rocks for current level
-    draw_chain();
     draw_monsters();
     objects_draw_all(); // Draw rocks
     jerk_draw();
     draw_player();
+    draw_chain();
     draw_chain_hud();
     draw_hearts_hud();
     draw_win_condition_hud();
@@ -402,11 +402,11 @@ int main(void)
 
         if(needs_redraw) {
             draw_background();
-            draw_chain();
             draw_monsters();
             objects_draw_all(); // Draw rocks
             jerk_draw();
             draw_player();
+            draw_chain();
             draw_chain_hud();
             draw_hearts_hud();
             draw_win_condition_hud();

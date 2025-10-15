@@ -694,10 +694,10 @@ void animate_gravity_and_refill(void)
         // Draw intermediate frame if anything moved
         if(moved) {
             draw_background();
-            draw_chain();
             draw_monsters();
             objects_draw_all(); // Draw rocks
             draw_player();
+            draw_chain();
             draw_chain_hud();
             draw_hearts_hud();
             draw_win_condition_hud();
@@ -746,10 +746,10 @@ void animate_gravity_and_refill(void)
                     hostile[r][col] = false;
                     r = below;
                     draw_background();
-                    draw_chain();
                     draw_monsters();
                     objects_draw_all(); // Draw rocks
                     draw_player();
+                    draw_chain();
                     draw_chain_hud();
                     draw_hearts_hud();
                     draw_win_condition_hud();

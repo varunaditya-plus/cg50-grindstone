@@ -310,12 +310,12 @@ void execute_chain(void)
         }
 		// Redraw frame
 		draw_background();
-        // Chain behind entities
-        draw_chain();
+        // Chain above entities
         draw_monsters();
         objects_draw_all(); // Draw rocks
         jerk_draw();
-		draw_player();
+        draw_player();
+        draw_chain();
 		// Draw HUD elements
 		draw_chain_hud();
 		draw_hearts_hud();
@@ -371,14 +371,15 @@ void execute_chain(void)
     // Check for win condition after chain execution
     levels_handle_level_completion();
 
-	// Redraw everything
-	draw_background();
-	// After resolving the board, mark new hostile monsters for next round
-	add_random_hostile_after_chain();
-	draw_monsters();
-	objects_draw_all(); // Draw rocks
-	jerk_draw();
-	draw_player();
+    // Redraw everything
+    draw_background();
+    // After resolving the board, mark new hostile monsters for next round
+    add_random_hostile_after_chain();
+    draw_monsters();
+    objects_draw_all(); // Draw rocks
+    jerk_draw();
+    draw_player();
+    draw_chain();
 	// Draw HUD elements
 	draw_chain_hud();
 	draw_hearts_hud();
