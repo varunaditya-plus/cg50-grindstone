@@ -12,6 +12,7 @@ find_package(Gint 2.9 REQUIRED)
 
 set(SOURCES
   src/main.c
+  src/screens.c
   src/game.h
   src/grid.c
   src/grid.h
@@ -25,6 +26,7 @@ set(SOURCES
   src/grindstone.h
   src/font.c
   src/font.h
+  src/screens.h
   src/bosses.c
   src/bosses.h
   src/levels.c

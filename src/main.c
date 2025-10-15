@@ -17,6 +17,7 @@
 #include "bosses.h"
 #include "levels.h"
 #include "objects.h"
+#include "screens.h"
 
 // Game state
 int player_lives = MAX_LIVES;
@@ -252,41 +253,8 @@ void draw_chain_hud(void)
 int main(void)
 {
     srand(time(NULL));
-    dclear(COLOR_BACKGROUND);
-    
-    // Title screen
-    const char* title = "GRINDSTONE";
-    int scale = 3;
-    int title_w = font_text_width_scaled(title, scale);
-    int title_x = (SCREEN_WIDTH - title_w) / 2;
-    int title_y = SCREEN_HEIGHT / 2 - 12 - 5;
-    // Animated title
-    {
-        int colors[4] = {COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE};
-        const char* prompt = "PRESS EXE TO START";
-        int prompt_w = strlen(prompt) * 8;
-        int prompt_x = (SCREEN_WIDTH - prompt_w) / 2;
-        int prompt_y = title_y + 8*scale + 10;
-        int offset = 0;
-        for(;;) {
-            dclear(COLOR_BACKGROUND);
-            int len = strlen(title);
-            for(int i = 0; i < len; i++) {
-                char ch[2];
-                ch[0] = title[i];
-                ch[1] = '\0';
-                int cx = title_x + i * 8 * scale;
-                int color_index = (i + offset) % 4;
-                font_draw_text_scaled(cx, title_y, ch, scale, colors[color_index]);
-            }
-            font_draw_text(prompt_x, prompt_y, prompt);
-            dupdate();
-
-            for(volatile int d = 0; d < 1000000; d++);
-            if(keydown(KEY_EXE)) break;
-            offset = (offset + 1) % 4;
-        }
-    }
+    screens_show_main_menu();
+    screens_show_powerup_select();
     
     dclear(C_WHITE);
     
