@@ -186,3 +186,41 @@ void font_draw_text(int x, int y, const char* text)
         text++;
     }
 }
+
+int font_text_width_scaled(const char* text, int scale)
+{
+    if(scale < 1) scale = 1;
+    int width = 0;
+    while(*text) {
+        width += 8 * scale;
+        text++;
+    }
+    return width;
+}
+
+void font_draw_text_scaled(int x, int y, const char* text, int scale, color_t color)
+{
+    if(scale < 1) scale = 1;
+    int cursor_x = x;
+    while(*text) {
+        char c = *text;
+        if(c >= 32 && c <= 126) {
+            int char_index = c - 32;
+            for(int row = 0; row < 8; row++) {
+                int pixel_row = font_8x8[char_index][row];
+                for(int col = 0; col < 8; col++) {
+                    if(pixel_row & (0x80 >> col)) {
+                        // draw scaled pixel block
+                        for(int sy = 0; sy < scale; sy++) {
+                            for(int sx = 0; sx < scale; sx++) {
+                                dpixel(cursor_x + col*scale + sx, y + row*scale + sy, color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        cursor_x += 8 * scale;
+        text++;
+    }
+}
