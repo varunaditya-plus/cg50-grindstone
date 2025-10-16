@@ -39,12 +39,9 @@ void screens_show_main_menu(void)
         
         for(volatile int d = 0; d < 1000000; d++);
         
-        if(keydown(KEY_EXE)) {
-            while(keydown(KEY_EXE)) {
-                for(volatile int d = 0; d < 100000; d++);
-            }
-            break;
-        }
+        volatile int timeout = 1;
+        key_event_t ev = getkey_opt(GETKEY_DEFAULT, &timeout);
+        if(ev.key == KEY_EXE) break;
     }
 }
 
