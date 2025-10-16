@@ -7,6 +7,7 @@
 #include "chain.h"
 #include "levels.h"
 #include "font.h"
+#include "objects.h"
 
 // Multiple jerk instances
 jerk_t jerks[MAX_JERKS];
@@ -103,7 +104,9 @@ void jerk_move_towards_player(void)
         if(target_row >= 0 && target_row < GRID_SIZE &&
            target_col >= 0 && target_col < GRID_SIZE &&
            !(target_row == player_row && target_col == player_col) &&
-           !grindstone_is_at(target_row, target_col)) {
+           !grindstone_is_at(target_row, target_col) &&
+           !rock_is_at(target_row, target_col) &&
+           !jerk_is_at(target_row, target_col)) {
             creep_type_t target_creep = grid[target_row][target_col];
             bool target_hostile = hostile[target_row][target_col];
             int old_row = jerks[i].row;

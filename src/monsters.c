@@ -9,7 +9,8 @@
 #include "levels.h"
 #include "objects.h"
 
-// Forward declaration
+// Forward declarations
+void draw_level_hud(void);
 void draw_win_condition_hud(void);
 
 creep_type_t grid[GRID_SIZE][GRID_SIZE];
@@ -698,6 +699,7 @@ void animate_gravity_and_refill(void)
             objects_draw_all(); // Draw rocks
             draw_player();
             draw_chain();
+            draw_level_hud();
             draw_chain_hud();
             draw_hearts_hud();
             draw_win_condition_hud();
@@ -750,6 +752,7 @@ void animate_gravity_and_refill(void)
                     objects_draw_all(); // Draw rocks
                     draw_player();
                     draw_chain();
+                    draw_level_hud();
                     draw_chain_hud();
                     draw_hearts_hud();
                     draw_win_condition_hud();

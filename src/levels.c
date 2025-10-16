@@ -47,39 +47,63 @@ static position_t level3_rocks[] = {
     {5,5},{5,6},{6,5},{6,6}
 };
 
-// Level 4
-static position_t level4_rocks[] = {
+
+// Level 6
+static position_t level6_rocks[] = {
     {GRID_SIZE-1,0},{GRID_SIZE-1,1},{GRID_SIZE-1,2},
     {GRID_SIZE-1,4},{GRID_SIZE-1,5},{GRID_SIZE-1,6}
 };
 
-// Level 5
-static position_t level5_rocks[] = {
+// Level 7
+static position_t level7_rocks[] = {
     {GRID_SIZE-2,0},{GRID_SIZE-2,GRID_SIZE-1}
+};
+
+// Level 8
+static position_t level8_rocks[] = {
+    {0,3},{1,3},{2,3},{4,3},{5,3},{6,3},
+    {3,0},{3,1},{3,2},{3,4},{3,5},{3,6}
+};
+
+// Level 9
+static position_t level9_rocks[] = {
+    {0,0},{1,1},{2,2},{4,4},{5,5},{6,6},
+    {0,6},{1,5},{2,4},{4,2},{5,1},{6,0}
+};
+
+// Level 10
+static position_t level10_rocks[] = {
+    {0,0},{0,1},{0,2},{0,4},{0,5},{0,6},
+    {6,0},{6,1},{6,2},{6,4},{6,5},{6,6}
 };
 
 // Jerk spawn arrays per level (sequential)
 static position_t level1_jerk_spawns[] = {};
 static position_t level2_jerk_spawns[] = {};
-static position_t level3_jerk_spawns[] = {{0, GRID_SIZE/2}};
-static position_t level4_jerk_spawns[] = {{0,0}, {0, GRID_SIZE-1}};
-static position_t level5_jerk_spawns[] = {{GRID_SIZE-1,0}, {GRID_SIZE-1, GRID_SIZE-1}};
+static position_t level3_jerk_spawns[] = {};
+static position_t level4_jerk_spawns[] = {{0, GRID_SIZE/2}};
+static position_t level5_jerk_spawns[] = {{0, GRID_SIZE/2}};
+static position_t level6_jerk_spawns[] = {{0,0}, {0, GRID_SIZE-1}};
+static position_t level7_jerk_spawns[] = {{GRID_SIZE-1,0}, {GRID_SIZE-1, GRID_SIZE-1}};
+static position_t level8_jerk_spawns[] = {{0, GRID_SIZE/2}, {GRID_SIZE-1, GRID_SIZE/2}};
+static position_t level9_jerk_spawns[] = {{0, GRID_SIZE/2}, {GRID_SIZE/2, GRID_SIZE-1}};
+static position_t level10_jerk_spawns[] = {{GRID_SIZE/2, 0}};
 
 // Level definitions
 level_t levels[] = {
-    // Level 1: No jerk, smash 30 creeps, rocks on sides and top
+    // Level 1: No jerk, smash 20 creeps, minimal rocks
     {
         .jerk_enabled = false,
         .jerk_spawns = level1_jerk_spawns,
         .jerk_spawn_count = 0,
         .monster_count = 3,
-        .rock_count = sizeof(level1_rocks) / sizeof(level1_rocks[0]),
-        .rock_positions = level1_rocks,
+        .rock_count = 0,
+        .rock_positions = NULL,
         .name = "Level 1",
-        .win_condition_text = "SMASH 30 CREEPS",
-        .target_smashes = 30
+        .win_condition_text = "SMASH 20 CREEPS",
+        .target_smashes = 20
     },
-    // Level 2: No jerk, smash 60 creeps, rocks on sides
+    // Level 2: No jerk, smash 30 creeps, rocks on sides
     {
         .jerk_enabled = false,
         .jerk_spawns = level2_jerk_spawns,
@@ -88,46 +112,104 @@ level_t levels[] = {
         .rock_count = sizeof(level2_rocks) / sizeof(level2_rocks[0]),
         .rock_positions = level2_rocks,
         .name = "Level 2",
-        .win_condition_text = "SMASH 60 CREEPS",
-        .target_smashes = 60
+        .win_condition_text = "SMASH 30 CREEPS",
+        .target_smashes = 30
     },
-    // Level 3: One jerk (top middle), kill all jerks, 2x2 rocks in corners
+    // Level 3: No jerk, smash 50 creeps, corner rocks
     {
-        .jerk_enabled = true,
+        .jerk_enabled = false,
         .jerk_spawns = level3_jerk_spawns,
-        .jerk_spawn_count = sizeof(level3_jerk_spawns) / sizeof(level3_jerk_spawns[0]),
+        .jerk_spawn_count = 0,
         .monster_count = 3,
         .rock_count = sizeof(level3_rocks) / sizeof(level3_rocks[0]),
         .rock_positions = level3_rocks,
         .name = "Level 3",
-        .win_condition_text = "KILL ALL JERKS",
-        .target_smashes = 0
-    }
-    ,
-    // Level 4: Two jerks (top-left, top-right), kill all jerks, bottom row rocks (except middle)
+        .win_condition_text = "SMASH 50 CREEPS",
+        .target_smashes = 50
+    },
+    // Level 4: One jerk (top middle), kill all jerks, 2x2 rocks in corners
     {
         .jerk_enabled = true,
         .jerk_spawns = level4_jerk_spawns,
         .jerk_spawn_count = sizeof(level4_jerk_spawns) / sizeof(level4_jerk_spawns[0]),
         .monster_count = 3,
-        .rock_count = sizeof(level4_rocks) / sizeof(level4_rocks[0]),
-        .rock_positions = level4_rocks,
+        .rock_count = sizeof(level3_rocks) / sizeof(level3_rocks[0]),
+        .rock_positions = level3_rocks,
         .name = "Level 4",
         .win_condition_text = "KILL ALL JERKS",
         .target_smashes = 0
-    }
-    ,
-    // Level 5: Two jerks (bottom-left, bottom-right), smash 50 creeps, rocks above bottom corners
+    },
+    // Level 5: One jerk (top middle), smash 40 creeps, side rocks
     {
         .jerk_enabled = true,
         .jerk_spawns = level5_jerk_spawns,
         .jerk_spawn_count = sizeof(level5_jerk_spawns) / sizeof(level5_jerk_spawns[0]),
         .monster_count = 3,
-        .rock_count = sizeof(level5_rocks) / sizeof(level5_rocks[0]),
-        .rock_positions = level5_rocks,
+        .rock_count = sizeof(level1_rocks) / sizeof(level1_rocks[0]),
+        .rock_positions = level1_rocks,
         .name = "Level 5",
+        .win_condition_text = "SMASH 40 CREEPS",
+        .target_smashes = 40
+    },
+    // Level 6: Two jerks (top-left, top-right), kill all jerks, bottom row rocks (except middle)
+    {
+        .jerk_enabled = true,
+        .jerk_spawns = level6_jerk_spawns,
+        .jerk_spawn_count = sizeof(level6_jerk_spawns) / sizeof(level6_jerk_spawns[0]),
+        .monster_count = 3,
+        .rock_count = sizeof(level6_rocks) / sizeof(level6_rocks[0]),
+        .rock_positions = level6_rocks,
+        .name = "Level 6",
+        .win_condition_text = "KILL ALL JERKS",
+        .target_smashes = 0
+    },
+    // Level 7: Two jerks (bottom-left, bottom-right), smash 50 creeps, rocks above corners
+    {
+        .jerk_enabled = true,
+        .jerk_spawns = level7_jerk_spawns,
+        .jerk_spawn_count = sizeof(level7_jerk_spawns) / sizeof(level7_jerk_spawns[0]),
+        .monster_count = 3,
+        .rock_count = sizeof(level7_rocks) / sizeof(level7_rocks[0]),
+        .rock_positions = level7_rocks,
+        .name = "Level 7",
         .win_condition_text = "SMASH 50 CREEPS",
         .target_smashes = 50
+    },
+    // Level 8: Two jerks (top-middle, bottom-middle), kill all jerks, cross pattern rocks
+    {
+        .jerk_enabled = true,
+        .jerk_spawns = level8_jerk_spawns,
+        .jerk_spawn_count = sizeof(level8_jerk_spawns) / sizeof(level8_jerk_spawns[0]),
+        .monster_count = 3,
+        .rock_count = sizeof(level8_rocks) / sizeof(level8_rocks[0]),
+        .rock_positions = level8_rocks,
+        .name = "Level 8",
+        .win_condition_text = "KILL ALL JERKS",
+        .target_smashes = 0
+    },
+    // Level 9: Two jerks (top-middle, right-middle), kill all jerks, diagonal rocks
+    {
+        .jerk_enabled = true,
+        .jerk_spawns = level9_jerk_spawns,
+        .jerk_spawn_count = sizeof(level9_jerk_spawns) / sizeof(level9_jerk_spawns[0]),
+        .monster_count = 3,
+        .rock_count = sizeof(level9_rocks) / sizeof(level9_rocks[0]),
+        .rock_positions = level9_rocks,
+        .name = "Level 9",
+        .win_condition_text = "KILL ALL JERKS",
+        .target_smashes = 0
+    },
+    // Level 10: One jerk (left-middle), kill all jerks, top and bottom rocks (except centers)
+    {
+        .jerk_enabled = true,
+        .jerk_spawns = level10_jerk_spawns,
+        .jerk_spawn_count = sizeof(level10_jerk_spawns) / sizeof(level10_jerk_spawns[0]),
+        .monster_count = 3,
+        .rock_count = sizeof(level10_rocks) / sizeof(level10_rocks[0]),
+        .rock_positions = level10_rocks,
+        .name = "Level 10",
+        .win_condition_text = "KILL ALL JERKS",
+        .target_smashes = 0
     }
 };
 

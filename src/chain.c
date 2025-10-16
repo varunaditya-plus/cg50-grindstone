@@ -11,6 +11,7 @@
 #include "levels.h"
 
 // Forward declarations
+void draw_level_hud(void);
 void draw_win_condition_hud(void);
 int jerk_damage_player_if_adjacent(void);
 void jerk_move_towards_player(void);
@@ -315,6 +316,7 @@ void execute_chain(void)
         draw_player();
         draw_chain();
 		// Draw HUD elements
+		draw_level_hud();
 		draw_chain_hud();
 		draw_hearts_hud();
 		draw_win_condition_hud();
@@ -379,6 +381,7 @@ void execute_chain(void)
     draw_player();
     draw_chain();
 	// Draw HUD elements
+	draw_level_hud();
 	draw_chain_hud();
 	draw_hearts_hud();
 	draw_win_condition_hud();

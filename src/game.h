@@ -77,6 +77,7 @@ extern bool game_won;
 
 // Function declarations
 void draw_hearts_hud(void);
+void draw_level_hud(void);
 void draw_win_condition_hud(void);
 int check_damage_from_hostile_monsters(void);
 

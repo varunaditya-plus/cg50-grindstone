@@ -144,6 +144,15 @@ void draw_hearts_hud(void)
 	}
 }
 
+void draw_level_hud(void)
+{
+    int margin = 6;
+    int y = margin;
+    char buf[16];
+    snprintf(buf, sizeof(buf), "LEVEL %d", current_level + 1);
+    font_draw_text(margin, y, buf);
+}
+
 void draw_win_condition_hud(void)
 {
 	level_t* current = levels_get_current();
@@ -272,6 +281,7 @@ int main(void)
     jerk_draw();
     draw_player();
     draw_chain();
+    draw_level_hud();
     draw_chain_hud();
     draw_hearts_hud();
     draw_win_condition_hud();
@@ -330,6 +340,25 @@ int main(void)
             objects_spawn_for_level(); // Spawn rocks for new level
             needs_redraw = true;
         }
+
+        
+        else if(key.key == KEY_F6) {
+            // Advance to next level
+            levels_next_level();
+            chain_color_shape = CREEP_COUNT;
+            chain_len = 0;
+            grindstone_clear_all();
+            randomize_grid();
+            clear_all_hostile();
+            jerk_reset();
+            reset_player_pos();
+            jerk_spawn(); // Spawn jerk at new level position
+            objects_reset();
+            objects_spawn_for_level(); // Spawn rocks for new level
+            needs_redraw = true;
+        }
+        
+
         else if(key.key == KEY_ACON) {
             // Clear current chain
             chain_color_shape = CREEP_COUNT;
@@ -411,6 +440,7 @@ int main(void)
             jerk_draw();
             draw_player();
             draw_chain();
+            draw_level_hud();
             draw_chain_hud();
             draw_hearts_hud();
             draw_win_condition_hud();
