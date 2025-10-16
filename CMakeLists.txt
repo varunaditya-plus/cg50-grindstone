@@ -26,6 +26,8 @@ set(SOURCES
   src/grindstone.h
   src/font.c
   src/font.h
+  src/powerups.c
+  src/powerups.h
   src/screens.h
   src/bosses.c
   src/bosses.h
